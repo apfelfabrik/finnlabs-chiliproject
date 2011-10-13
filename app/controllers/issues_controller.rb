@@ -51,6 +51,7 @@ class IssuesController < ApplicationController
   verify :method => :put, :only => :update, :render => {:nothing => true, :status => :method_not_allowed }
 
   def index
+    retrieve_query
     sort_init(@query.sort_criteria.empty? ? [['parent', 'desc']] : @query.sort_criteria)
     sort_update(@query.sortable_columns)
 
