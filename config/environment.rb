@@ -66,6 +66,7 @@ Rails::Initializer.run do |config|
   # Use redmine's custom plugin locater
   require File.join(RAILS_ROOT, "lib/redmine_plugin_locator")
   config.plugin_locators << RedminePluginLocator
+  config.action_controller.session = { :key => "_myapp_session", :secret => "This is the secret phrase for my development session on the new Chiliproject Design." }
 
   # Load any local configuration that is kept out of source control
   # (e.g. patches).

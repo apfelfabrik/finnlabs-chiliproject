@@ -13,6 +13,7 @@
 
 class LdapAuthSourcesController < AuthSourcesController
 
+  menu_item :ldap_authentication, :only => [:index]
   protected
 
   def auth_source_class

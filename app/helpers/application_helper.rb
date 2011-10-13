@@ -43,11 +43,11 @@ module ApplicationHelper
     link_to_remote(name, options, html_options) if authorize_for(url[:controller] || params[:controller], url[:action])
   end
 
-  # Displays a link to user's account page if active
+  # Displays a link to user's account page if active or registered
   def link_to_user(user, options={})
     if user.is_a?(User)
       name = h(user.name(options[:format]))
-      if user.active?
+      if user.active? || user.registered?
         link_to name, :controller => 'users', :action => 'show', :id => user
       else
         name
@@ -60,6 +60,29 @@ module ApplicationHelper
   # Show a sorted linkified (if active) comma-joined list of users
   def list_users(users, options={})
     users.sort.collect{|u| link_to_user(u, options)}.join(", ")
+  end
+
+  #returns a class name based on the user's status
+  def user_status_class(user)
+    case user.status
+      when User::STATUS_ACTIVE
+        "status_active"
+      when User::STATUS_REGISTERED
+        "status_registered"
+      when User::STATUS_LOCKED
+        "status_locked"
+    end
+  end
+
+  def user_status_i18n(user)
+    case user.status
+      when User::STATUS_ACTIVE
+        l(:status_active)
+      when User::STATUS_REGISTERED
+        l(:status_registered)
+      when User::STATUS_LOCKED
+        l(:status_locked)
+    end
   end
 
   # Displays a link to +issue+ with its subject.
@@ -223,17 +246,15 @@ module ApplicationHelper
   end
 
   # Renders the project quick-jump box
-  def render_project_jump_box
-    projects = User.current.memberships.collect(&:project).compact.uniq
+  def render_project_jump_box(projects = [], html_options = {})
+    projects ||= User.current.memberships.collect(&:project).compact.uniq
     if projects.any?
-      s = '<select onchange="if (this.value != \'\') { window.location = this.value; }">' +
-            "<option value=''>#{ l(:label_jump_to_a_project) }</option>" +
-            '<option value="" disabled="disabled">---</option>'
-      s << project_tree_options_for_select(projects, :selected => @project) do |p|
-        { :value => url_for(:controller => 'projects', :action => 'show', :id => p, :jump => current_menu_item) }
-      end
-      s << '</select>'
-      s
+        # option_tags = content_tag :option, l(:label_jump_to_a_project), :value => ""
+        option_tags = (content_tag :option, "", :value => "" )
+        option_tags << project_tree_options_for_select(projects, :selected => @project) do |p|
+          { :value => url_for(:controller => 'projects', :action => 'show', :id => p, :jump => current_menu_item) }
+        end
+      select_tag "", option_tags, html_options.merge({ :onchange => "if (this.value != \'\') { window.location = this.value; }" })
     end
   end
 
@@ -287,7 +308,7 @@ module ApplicationHelper
   def principals_check_box_tags(name, principals)
     s = ''
     principals.sort.each do |principal|
-      s << "<label>#{ check_box_tag name, principal.id, false } #{h principal}</label>\n"
+      s << "<label class='#{user_status_class principal}' title='#{user_status_i18n principal}'>#{ check_box_tag name, principal.id, false } #{h principal}</label>\n"
     end
     s
   end
@@ -388,7 +409,9 @@ module ApplicationHelper
   end
 
   def page_header_title
-    if @project.nil? || @project.new_record?
+    if @page_header_title.present?
+      h(@page_header_title)
+    elsif @project.nil? || @project.new_record?
       h(Setting.app_title)
     else
       b = []
@@ -934,6 +957,34 @@ module ApplicationHelper
     end
   end
 
+  # Expands the current menu item using JavaScript based on the params
+  def expand_current_menu
+    current_menu_class =
+      case 
+      when params[:controller] == "timelog"
+        "reports"
+      when params[:controller] == 'reports'
+        'issues'
+      when params[:controller] == 'projects' && params[:action] == 'changelog'
+        "reports"
+      when params[:controller] == 'issues' && ['calendar','gantt'].include?(params[:action])
+        "reports"
+      when params[:controller] == 'projects' && params[:action] == 'roadmap'
+        'roadmap'
+      when params[:controller] == 'versions' && params[:action] == 'show'
+        'roadmap'
+      when params[:controller] == 'projects' && params[:action] == 'settings'
+        'settings'
+      when params[:controller] == 'contracts' || params[:controller] == 'deliverables'
+        'contracts'
+      else
+        params[:controller]
+      end
+
+    
+    javascript_tag("jQuery.menu_expand({ menuItem: '.#{current_menu_class}' });")
+  end
+  
   private
 
   def wiki_helper
@@ -945,4 +996,9 @@ module ApplicationHelper
   def link_to_content_update(text, url_params = {}, html_options = {})
     link_to(text, url_params, html_options)
   end
+  
+  def password_complexity_requirements
+    "<em>" + l(:text_caracters_minimum, :count => Setting.password_min_length) + "</em>"
+  end
+  
 end

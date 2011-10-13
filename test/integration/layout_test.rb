@@ -22,7 +22,7 @@ class LayoutTest < ActionController::IntegrationTest
     assert_response :not_found
 
     # UsersController uses the admin layout by default
-    assert_select "#admin-menu", :count => 0
+    assert_select "#main-menu", :count => 0
   end
 
   test "browsing to an unauthorized page should render the base layout" do
@@ -32,7 +32,7 @@ class LayoutTest < ActionController::IntegrationTest
 
     get "/admin"
     assert_response :forbidden
-    assert_select "#admin-menu", :count => 0
+    assert_select "#main-menu", :count => 0
   end
 
   def test_top_menu_and_search_not_visible_when_login_required

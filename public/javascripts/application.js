@@ -252,7 +252,9 @@ function observeParentIssueField(url) {
                            paramName: 'q',
                            updateElement: function(value) {
                              document.getElementById('issue_parent_issue_id').value = value.id;
-                           }});
+                           },
+                           parameters: 'scope=all'
+                           });
 }
 
 function observeRelatedIssueField(url) {
@@ -367,5 +369,23 @@ function hideOnLoad() {
   	el.hide();
 	});
 }
+
+Event.observe(window, "load", function(){
+  if(Prototype.Browser.IE) {
+    var quickSelect = $$("#quick-search/select")[0];
+    if(quickSelect) {
+      var originalWidth = quickSelect.getStyle("width");
+      var collapseSelect = function() {
+        this.setStyle({width: originalWidth, minWidth: originalWidth});
+      };
+      var expandSelect = function() {
+        this.setStyle({width: "auto", minWidth: originalWidth});
+      };
+      Event.observe(quickSelect, "mousedown", expandSelect);
+      Event.observe(quickSelect, "blur", collapseSelect);
+      Event.observe(quickSelect, "change", collapseSelect);
+    }
+  }
+});
 
 Event.observe(window, 'load', hideOnLoad);
