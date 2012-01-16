@@ -46,6 +46,7 @@ class ActiveSupport::TestCase
   # Add more helper methods to be used by all tests here...
   def setup
     super
+    Setting.use_caching = false
     Rails.cache.clear
   end
 

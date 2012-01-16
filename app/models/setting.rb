@@ -97,7 +97,11 @@ class Setting < ActiveRecord::Base
 
   # Returns the value of the setting named name
   def self.[](name)
-    Marshal.load(Rails.cache.fetch(self.cache_key(name)) {Marshal.dump(find_or_default(name).value)})
+    if use_caching?
+      Marshal.load(Rails.cache.fetch(self.cache_key(name)) {Marshal.dump(find_or_default(name).value)})
+    else
+      find_or_default(name).value
+    end
   end
 
   def self.[]=(name, v)
@@ -164,6 +168,25 @@ class Setting < ActiveRecord::Base
     ActiveSupport::Deprecation.warn "The Setting.clear_cache method is " +
       "deprecated and will be removed in the future. There should be no " +
       "replacement for this functionality needed."
+  end
+
+  # Temporarily deactivate settings caching in the block scope
+  def self.uncached
+    cache_setting = self.use_caching
+    self.use_caching = false
+    yield
+  ensure
+    self.use_caching = cache_setting
+  end
+
+  # Check if Setting caching should be performed
+  def self.use_caching?
+    !Thread.current['chiliproject/settings/do_not_use_caching']
+  end
+
+  # Dis-/En-able Setting caching. This is mainly intended to be used in tests
+  def self.use_caching=(new_value)
+    Thread.current['chiliproject/settings/do_not_use_caching'] = !new_value
   end
 
 private
