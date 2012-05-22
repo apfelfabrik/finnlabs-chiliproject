@@ -102,7 +102,7 @@
       <h1>
         <span class = 'hidden-for-sighted'><%=l(:description_current_position)%></span>
         <%= breadcrumb_list(link_to('Home', home_path),
-                       link_to_project_ancestors(@project),
+                       (!@project.new_record? && link_to_project_ancestors(@project)),
                        *breadcrumb_paths) %>
       </h1>
     </div>
