@@ -35,7 +35,7 @@ class MembersController < ApplicationController
             page.replace_html "tab-content-members", :partial => 'projects/settings/members'
             page.insert_html :top, "tab-content-members", content_tag(:div, l(:notice_successful_create),
                                                                       :class => "flash notice")
-            page << 'hideOnLoad()'
+            page << 'hideOnLoad(); init_members_cb();'
           }
         }
       else
