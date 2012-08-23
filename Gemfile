@@ -12,8 +12,10 @@ gem 'delayed_job', "~>2.0.4"
 
 group :test do
   gem 'shoulda', '~> 2.10.3'
+  # Shoulda doesn't work nice on 1.9.3 and seems to need test-unit explicitely…
+  gem 'test-unit', :platforms => [:mri_19]
   gem 'edavis10-object_daddy', :require => 'object_daddy'
-  gem 'mocha'
+  gem 'mocha', '0.12.1' # why? see this: https://github.com/freerange/mocha/commit/2334b922881125e5cd1a0ef77b25c81a13e91269#commitcomment-1663176
 
   platforms :mri_18, :mingw_18 do gem 'ruby-debug' end
   platforms :mri_19, :mingw_19 do gem 'ruby-debug19', :require => 'ruby-debug' end
