@@ -160,6 +160,32 @@ OpenProject::Application.routes.draw do
       resources :members, :only => [:create, :update, :destroy], :shallow => true do
         get :autocomplete, :on => :collection
       end
+
+      scope :controller => 'repositories' do
+        scope :via => :get do
+          match '/repository/edit', :action => :edit
+          match '/repository/graph', :action => :graph
+          match '/repository/statistics', :action => :stats
+
+          match '/repository/revisions/:rev/diff/*path', :action => :diff, :rev => /[a-z0-9\.\-_]+/
+          match '/repository/revisions/:rev/diff(.:format)', :action => :diff, :rev => /[a-z0-9\.\-_]+/
+
+          match '/repository/revisions/:rev/raw/*path', :action => :entry, :rev => /[a-z0-9\.\-_]+/, :format => 'raw'
+          match '/repository/revisions/:rev/:action/*path', :rev => /[a-z0-9\.\-_]+/
+          match '/repository/revisions/:rev', :action => :revision, :rev => /[a-z0-9\.\-_]+/
+          match '/repository/revisions(.:format)', :action => :revisions
+          match '/repository/diff(/*path)', :action => :diff
+
+          match '/repository/raw/*path', :action => :entry, :format => 'raw'
+          # TODO: why the following route is required?
+          match '/repository/entry/*path', :action => :entry
+          match '/repository/:action/*path'
+
+          match '/repository(/*path)', :action => :show
+        end
+
+        match '/repository/:action', :via => :post
+      end
     end
 
     #TODO: evaluate whether this can be turned into a namespace
@@ -287,28 +313,6 @@ OpenProject::Application.routes.draw do
       resource :preview, :controller => 'news/previews', :only => [:create]
     end
 
-    scope :controller => 'repositories' do
-      scope :via => :get do
-        match '/projects/:id/repository', :action => :show
-        match '/projects/:id/repository/edit', :action => :edit
-        match '/projects/:id/repository/statistics', :action => :stats
-        match '/projects/:id/repository/revisions', :action => :revisions
-        match '/projects/:id/repository/revisions.:format', :action => :revisions
-        match '/projects/:id/repository/revisions/:rev', :action => :revision
-        match '/projects/:id/repository/revisions/:rev/diff', :action => :diff
-        match '/projects/:id/repository/revisions/:rev/diff.:format', :action => :diff
-        match '/projects/:id/repository/revisions/:rev/raw/*path', :action => :entry, :format => 'raw', :rev => /[a-z0-9\.\-_]+/
-        match '/projects/:id/repository/revisions/:rev/:action/*path', :rev => /[a-z0-9\.\-_]+/
-        match '/projects/:id/repository/raw/*path', :action => :entry, :format => 'raw'
-        # TODO: why the following route is required?
-        match '/projects/:id/repository/entry/*path', :action => :entry
-        match '/projects/:id/repository/:action/*path'
-      end
-
-      match '/projects/:id/repository/:action', :via => :post
-    end
-
-
     resources :attachments, :only => [:show, :destroy], :format => false do
       member do
         scope :via => :get,  :constraints => { :id => /\d+/, :filename => /[^\/]*/ } do
@@ -321,16 +325,6 @@ OpenProject::Application.routes.draw do
     scope :constraints => { :id => /\d+/, :filename => /[^\/]*/ } do
       match "/attachments/download/:id/:filename" => redirect("/attachments/%{id}/download/%{filename}"), :format => false
       match "/attachments/download/:id" => redirect("/attachments/%{id}/download"), :format => false
-    end
-
-    #left old routes at the bottom for backwards compat
-    scope :controller => 'repositories' do
-      match '/repositories/browse/:id/*path', :action => 'browse', :as => 'repositories_show'
-      match '/repositories/changes/:id/*path', :action => 'changes', :as => 'repositories_changes'
-      match '/repositories/diff/:id/*path', :action => 'diff', :as => 'repositories_diff'
-      match '/repositories/entry/:id/*path', :action => 'entry', :as => 'repositories_entry'
-      match '/repositories/annotate/:id/*path', :action => 'annotate', :as => 'stylesheet_link_tag'
-      match '/repositories/revision/:id/:rev', :action => 'revision'
     end
 
     scope :controller => 'sys' do

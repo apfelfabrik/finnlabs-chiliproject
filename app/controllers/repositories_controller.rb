@@ -61,7 +61,7 @@ class RepositoriesController < ApplicationController
       # Build a hash with repository usernames as keys and corresponding user ids as values
       @repository.committer_ids = params[:committers].values.inject({}) {|h, c| h[c.first] = c.last; h}
       flash[:notice] = l(:notice_successful_update)
-      redirect_to :action => 'committers', :id => @project
+      redirect_to :action => 'committers', :project_id => @project
     end
   end
 
@@ -72,6 +72,8 @@ class RepositoriesController < ApplicationController
 
   def show
     @repository.fetch_changesets if Setting.autofetch_changesets? && @path.empty?
+
+    #@path = params[:path].join('/') unless params[:path].blank?
 
     @entries = @repository.entries(@path, @rev)
     @changeset = @repository.find_changeset_by_name(@rev)
@@ -231,10 +233,10 @@ class RepositoriesController < ApplicationController
   REV_PARAM_RE = %r{\A[a-f0-9]*\Z}i
 
   def find_repository
-    @project = Project.find(params[:id])
+    @project = Project.find(params[:project_id])
     @repository = @project.repository
     (render_404; return false) unless @repository
-    @path = params[:path].join('/') unless params[:path].nil?
+    @path = params[:path]#.join('/') unless params[:path].nil?
     @path ||= ''
     @rev = params[:rev].blank? ? @repository.default_branch : params[:rev].to_s.strip
     @rev_to = params[:rev_to]

@@ -650,29 +650,111 @@ class RoutingTest < ActionController::IntegrationTest
     should route(:post, "/projects/64/copy").to( :controller => 'projects',
                                                  :action => 'copy',
                                                  :id => '64' )
-#  end
-#
-#  context "repositories" do
-#    should route(:get, "/projects/redmine/repository").to( :controller => 'repositories', :action => 'show', :id => 'redmine')
-#    should route(:get, "/projects/redmine/repository/edit").to( :controller => 'repositories', :action => 'edit', :id => 'redmine')
-#    should route(:get, "/projects/redmine/repository/revisions").to( :controller => 'repositories', :action => 'revisions', :id => 'redmine')
-#    should route(:get, "/projects/redmine/repository/revisions.atom").to( :controller => 'repositories', :action => 'revisions', :id => 'redmine', :format => 'atom')
-#    should route(:get, "/projects/redmine/repository/revisions/2457").to( :controller => 'repositories', :action => 'revision', :id => 'redmine', :rev => '2457')
-#    should route(:get, "/projects/redmine/repository/revisions/2457/diff").to( :controller => 'repositories', :action => 'diff', :id => 'redmine', :rev => '2457')
-#    should route(:get, "/projects/redmine/repository/revisions/2457/diff.diff").to( :controller => 'repositories', :action => 'diff', :id => 'redmine', :rev => '2457', :format => 'diff')
-#    should route(:get, "/projects/redmine/repository/diff/path/to/file.c").to( :controller => 'repositories', :action => 'diff', :id => 'redmine', :path => %w[path to file.c])
-#    should route(:get, "/projects/redmine/repository/revisions/2/diff/path/to/file.c").to( :controller => 'repositories', :action => 'diff', :id => 'redmine', :path => %w[path to file.c], :rev => '2')
-#    should route(:get, "/projects/redmine/repository/browse/path/to/file.c").to( :controller => 'repositories', :action => 'browse', :id => 'redmine', :path => %w[path to file.c])
-#    should route(:get, "/projects/redmine/repository/entry/path/to/file.c").to( :controller => 'repositories', :action => 'entry', :id => 'redmine', :path => %w[path to file.c])
-#    should route(:get, "/projects/redmine/repository/revisions/2/entry/path/to/file.c").to( :controller => 'repositories', :action => 'entry', :id => 'redmine', :path => %w[path to file.c], :rev => '2')
-#    should route(:get, "/projects/redmine/repository/raw/path/to/file.c").to( :controller => 'repositories', :action => 'entry', :id => 'redmine', :path => %w[path to file.c], :format => 'raw')
-#    should route(:get, "/projects/redmine/repository/revisions/2/raw/path/to/file.c").to( :controller => 'repositories', :action => 'entry', :id => 'redmine', :path => %w[path to file.c], :rev => '2', :format => 'raw')
-#    should route(:get, "/projects/redmine/repository/annotate/path/to/file.c").to( :controller => 'repositories', :action => 'annotate', :id => 'redmine', :path => %w[path to file.c])
-#    should route(:get, "/projects/redmine/repository/changes/path/to/file.c").to( :controller => 'repositories', :action => 'changes', :id => 'redmine', :path => %w[path to file.c])
-#    should route(:get, "/projects/redmine/repository/statistics").to( :controller => 'repositories', :action => 'stats', :id => 'redmine')
-#
-#
-#    should route(:post, "/projects/redmine/repository/edit").to( :controller => 'repositories', :action => 'edit', :id => 'redmine')
+  end
+
+  context "repositories" do
+    should route(:get, "/projects/redmine/repository").to( :controller => 'repositories',
+                                                           :action => 'show',
+                                                           :project_id => 'redmine' )
+
+    should route(:get, "/projects/redmine/repository/path/to/file.c").to( :controller => 'repositories',
+                                                                          :action => 'show',
+                                                                          :project_id => 'redmine',
+                                                                          :path => '/path/to/file.c' )
+
+    should route(:get, "/projects/redmine/repository/edit").to( :controller => 'repositories',
+                                                                :action => 'edit',
+                                                                :project_id => 'redmine' )
+
+    should route(:get, "/projects/redmine/repository/revisions").to( :controller => 'repositories',
+                                                                     :action => 'revisions',
+                                                                     :project_id => 'redmine' )
+
+    should route(:get, "/projects/redmine/repository/revisions.atom").to( :controller => 'repositories',
+                                                                          :action => 'revisions',
+                                                                          :project_id => 'redmine',
+                                                                          :format => 'atom' )
+
+    should route(:get, "/projects/redmine/repository/revisions/2457").to( :controller => 'repositories',
+                                                                          :action => 'revision',
+                                                                          :project_id => 'redmine',
+                                                                          :rev => '2457' )
+
+    should route(:get, "/projects/redmine/repository/diff").to( :controller => 'repositories',
+                                                                :action => 'diff',
+                                                                :project_id => 'redmine' )
+
+    should route(:get, "/projects/redmine/repository/revisions/2457/diff").to( :controller => 'repositories',
+                                                                               :action => 'diff',
+                                                                               :project_id => 'redmine',
+                                                                               :rev => '2457')
+
+    should route(:get, "/projects/redmine/repository/revisions/2457/diff.diff").to( :controller => 'repositories',
+                                                                                    :action => 'diff',
+                                                                                    :project_id => 'redmine',
+                                                                                    :rev => '2457',
+                                                                                    :format => 'diff' )
+
+    should route(:get, "/projects/redmine/repository/diff/path/to/file.c").to( :controller => 'repositories',
+                                                                               :action => 'diff',
+                                                                               :project_id => 'redmine',
+                                                                               :path => 'path/to/file.c' )
+
+    should route(:get, "/projects/redmine/repository/revisions/2/diff/path/to/file.c").to( :controller => 'repositories',
+                                                                                           :action => 'diff',
+                                                                                           :project_id => 'redmine',
+                                                                                           :path => 'path/to/file.c',
+                                                                                           :rev => '2' )
+
+    should route(:get, "/projects/redmine/repository/browse/path/to/file.c").to( :controller => 'repositories',
+                                                                                 :action => 'browse',
+                                                                                 :project_id => 'redmine',
+                                                                                 :path => 'path/to/file.c' )
+
+    should route(:get, "/projects/redmine/repository/entry/path/to/file.c").to( :controller => 'repositories',
+                                                                                :action => 'entry',
+                                                                                :project_id => 'redmine',
+                                                                                :path => 'path/to/file.c' )
+    should route(:get, "/projects/redmine/repository/revisions/2/entry/path/to/file.c").to( :controller => 'repositories',
+                                                                                           :action => 'entry',
+                                                                                           :project_id => 'redmine',
+                                                                                           :path => 'path/to/file.c',
+                                                                                           :rev => '2' )
+
+    should route(:get, "/projects/redmine/repository/raw/path/to/file.c").to( :controller => 'repositories',
+                                                                              :action => 'entry',
+                                                                              :project_id => 'redmine',
+                                                                              :path => 'path/to/file.c',
+                                                                              :format => 'raw' )
+
+    should route(:get, "/projects/redmine/repository/revisions/2/raw/path/to/file.c").to( :controller => 'repositories',
+                                                                                          :action => 'entry',
+                                                                                          :project_id => 'redmine',
+                                                                                          :path => 'path/to/file.c',
+                                                                                          :rev => '2',
+                                                                                          :format => 'raw' )
+
+    should route(:get, "/projects/redmine/repository/annotate/path/to/file.c").to( :controller => 'repositories',
+                                                                                   :action => 'annotate',
+                                                                                   :project_id => 'redmine',
+                                                                                   :path => 'path/to/file.c' )
+
+    should route(:get, "/projects/redmine/repository/changes/path/to/file.c").to( :controller => 'repositories',
+                                                                                  :action => 'changes',
+                                                                                  :project_id => 'redmine',
+                                                                                  :path => 'path/to/file.c' )
+
+    should route(:get, "/projects/redmine/repository/statistics").to( :controller => 'repositories',
+                                                                      :action => 'stats',
+                                                                      :project_id => 'redmine' )
+
+    should route(:get, "/projects/redmine/repository/graph").to( :controller => 'repositories',
+                                                                 :action => 'graph',
+                                                                 :project_id => 'redmine' )
+
+    should route(:post, "/projects/redmine/repository/edit").to( :controller => 'repositories',
+                                                                 :action => 'edit',
+                                                                 :project_id => 'redmine' )
   end
 
   context "files" do
