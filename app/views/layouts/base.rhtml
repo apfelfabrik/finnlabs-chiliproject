@@ -31,6 +31,13 @@
 
 <%= stylesheet_link_tag 'select2'%>
 <%= stylesheet_link_tag 'select2_customizing'%>
+<%= javascript_include_tag "i18n" %>
+<%= javascript_include_tag "translations" %>
+<% javascript_tag do -%>
+  I18n.defaultLocale = "<%= I18n.default_locale %>";
+  I18n.locale = "<%= I18n.locale %>";
+<% end %>
+
 <% if User.current.impaired? && accessibility_css_enabled? %>
   <%= stylesheet_link_tag 'accessibility' %>
 <% end %>
