@@ -60,7 +60,7 @@
 }
 
 .select2-results li {
-  line-height: 80%;
+  line-height: 90%;
   padding: 7px 7px 8px;
 }
 .select2-results .select2-result {
@@ -86,7 +86,7 @@
   background-image: none;
 }
 .select2-results .select2-no-results {
-  background: #fff;
+  background: white;
   border: none;
 }
 
@@ -97,3 +97,8 @@
 .select2-more-results.select2-active {
   background: transparent url('../images/loading.gif') no-repeat 100%;
 }
+.select2-container-active .select2-choice, .select2-container-active .select2-choices {
+    outline: 5px auto #999;
+    border-color: #AAA;
+}
+
