@@ -56,11 +56,25 @@ jQuery(document).ready(function($) {
     memberstab.click(init_members_cb);
   }
 
-  formatItems = function (item) {
-    return "<span class='select2-match' data-value='" + item.id + "'>" + item.name + "</span>";
+  formatItems = function (item, container, query) {
+    var match = item.name.toUpperCase().indexOf(query.term.toUpperCase()),
+    tl = query.term.length,
+    markup = [];
+
+    if (match < 0) {
+      return "<span data-value='" + item.id + "'>" + item.name + "</span>";
+    }
+
+    markup.push(item.name.substring(0, match));
+    markup.push("<span class='select2-match' data-value='" + item.id + "'>");
+    markup.push(item.name.substring(match, match + tl));
+    markup.push("</span>");
+    markup.push(item.name.substring(match + tl, item.name.length));
+    return markup.join("")
   }
+
   formatItemSelection = function (item) {
-    return null;
+    return item.text;
   }
 
 });
