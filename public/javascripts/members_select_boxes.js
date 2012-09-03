@@ -20,32 +20,30 @@ jQuery(document).ready(function($) {
             ajax: {
                 url: $(fakeInput).attr("data-ajaxURL"),
                 dataType: 'json',
-                quietMillis: 100,
+                quietMillis: 500,
                 contentType: "application/json",
                 data: function (term, page) {
                     return {
                         q: term, //search term
                         page_limit: 10, // page size
-                        page: page, // page number
+                        page: page, // current page number
                         id: fakeInput.attr("data-projectId") // current project id
                     };
                 },
                 results: function (data, page) {
 
-                    // notice we return the value of more so Select2 knows if more results can be loaded
-                    active_principals = []
-                    data.results.principals.each(function (e) {
-                      if (e.active === true) {
-                        active_principals.push(e);
-                      }
+                    active_items = []
+                    data.results.items.each(function (e) {
+                      active_items.push(e);
                     });
-                    return {'results': active_principals, 'more': data.results.more};
+                    // check if more items can be loaded
+                    return {'results': active_items, 'more': data.results.more};
                 }
             },
-            formatResult: formatPrincipal, // omitted for brevity, see the source of this page
-            formatSelection: formatPrincipalSelection
+            formatResult: formatItems,
+            formatSelection: formatItemSelection
           });
-          // $(elem).hide();
+          $(elem).hide();
         }, 0);
       }
     });
@@ -58,12 +56,11 @@ jQuery(document).ready(function($) {
     memberstab.click(init_members_cb);
   }
 
-  formatPrincipal = function (principal) {
-    var markup = "<span class='select2-match' data-value='" + principal.id + "'>" + principal.name + "</span>";
-    return markup;
+  formatItems = function (item) {
+    return "<span class='select2-match' data-value='" + item.id + "'>" + item.name + "</span>";
   }
-  formatPrincipalSelection = function (principal) {
-    return principal.name;
+  formatItemSelection = function (item) {
+    return null;
   }
 
 });

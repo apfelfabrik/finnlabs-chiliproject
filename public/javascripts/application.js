@@ -499,6 +499,14 @@ jQuery.viewportHeight = function() {
 /* TODO: integrate with existing code and/or refactor */
 jQuery(document).ready(function($) {
 
+  // Adjust Select2 Defaults to use translations
+  $.fn.select2.defaults.formatNoMatches = function () { return I18n.t("text_no_matches_found"); };
+  $.fn.select2.defaults.formatInputTooShort = function (input, min) { return I18n.t("text_more_input_needed", {number: min - input.length});   };
+  $.fn.select2.defaults.formatSelectionTooBig = function (limit) { return I18n.t("text_selection_too_big", {limit: limit}); };
+  $.fn.select2.defaults.formatLoadMore = function (pageNumber) { return I18n.t("label_loading"); };
+  $.fn.select2.defaults.formatSearching = function () { return I18n.t("label_searching"); }
+
+
   $('#project-search-container select.select2-select').each(function (ix, select) {
     var parent, select2Container, results, input;
     parent = $(select).parents('li.drop-down');

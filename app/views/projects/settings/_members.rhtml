@@ -1,7 +1,7 @@
 <%= error_messages_for 'member' %>
 <% roles = Role.find_all_givable
    members = @project.member_principals.find(:all, :include => [:roles, :principal]).sort
-   available_principals = Principal.possible_members("", 100) - @project.principals %>
+   available_principals = Principal.possible_members("", 100) - @project.principals
 
    member_per_page = 20
 
@@ -14,7 +14,7 @@
                           :order => User::USER_FORMATS_STRUCTURE[Setting.user_format].map{|attr| attr.to_s}.join(", ")
 %>
 
-<div class="splitcontentleft">
+<div>
 <% if @members.any? %>
   <% authorized = authorize_for('members', 'edit') %>
 <table class="list members">

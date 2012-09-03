@@ -5,8 +5,7 @@
     <legend><%= l(:label_member_new) %></legend>
     <p>
       <label>
-        <% options = principals.collect { |obj| [obj.name, obj.id] } %>
-        <%= select_tag "member[user_ids][]", options_for_select(options),
+        <%= select_tag "member[user_ids][]", options_for_select([]),
                        :title => l(:label_principal_search),
                        :multiple => true,
                        :'data-placeholder' => l(:label_principal_search),
@@ -17,12 +16,11 @@
     </p>
     <p>
       <label>
-        <% options = roles.collect { |obj| [obj.name, obj.id] } %>
-        <%= select_tag 'member[role_ids][]', options_for_select(options),
+        <%= select_tag 'member[role_ids][]', options_for_select([]),
                        :title => l(:label_role_plural),
                        :multiple => true,
-                       :'data-placeholder' => l(:label_role_plural),
-                       :'data-ajaxURL' => url_for(:controller => "members", :action => "autocomplete_for_roles"),
+                       :'data-placeholder' => l(:label_role_search),
+                       :'data-ajaxURL' => url_for(:controller => "roles", :action => "autocomplete_for_role"),
                        :'data-projectId' => project.id,
                        :class => "select2-select" %>
       </label>
