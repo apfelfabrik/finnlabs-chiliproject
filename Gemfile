@@ -10,6 +10,7 @@ gem "rdoc", ">= 2.4.2"
 gem "fastercsv", "~> 1.5.0", :platforms => [:ruby_18, :jruby, :mingw_18]
 
 gem "will_paginate", "~> 2.3.16"
+gem "i18n-js"
 
 group :test do
   gem 'shoulda', '~> 2.10.3'

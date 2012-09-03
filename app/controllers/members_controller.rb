@@ -91,7 +91,6 @@ class MembersController < ApplicationController
 
   def autocomplete_for_member
     size = params[:page_limit].to_i
-    principals = []
     page = params[:page].to_i
 
     @principals = Principal.paginated_search(params[:q], page, { :page_limit => size })

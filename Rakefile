@@ -15,3 +15,4 @@ rescue LoadError
 end
 
 require 'tasks/rails'
+require "i18n-js/rake"
