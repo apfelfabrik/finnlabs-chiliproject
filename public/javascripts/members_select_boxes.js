@@ -74,7 +74,7 @@ jQuery(document).ready(function($) {
   }
 
   formatItemSelection = function (item) {
-    return item.text;
+    return item.name;
   }
 
 });
