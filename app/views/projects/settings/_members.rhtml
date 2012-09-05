@@ -13,7 +13,17 @@
                           :include => [:roles, :principal, :member_roles],
                           :order => User::USER_FORMATS_STRUCTURE[Setting.user_format].map{|attr| attr.to_s}.join(", ")
 %>
+<div>
+  <% if roles.any? && available_principals.any? %>
+    <% partial = (User.current.impaired? ? "members/member_form_impaired" : "members/member_form") %>
+    <%= render :partial => partial,
+              :locals => { :project => @project,
+                           :members => members,
+                           :roles => roles,
+                           :principals => available_principals } %>
 
+  <% end %>
+</div>
 <div>
 <% if @members.any? %>
   <% authorized = authorize_for('members', 'edit') %>
@@ -65,16 +75,5 @@
 <% else %>
   <p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>
-</div>
-<div>
-  <% if roles.any? && available_principals.any? %>
-    <% partial = (User.current.impaired? ? "members/member_form_impaired" : "members/member_form") %>
-    <%= render :partial => partial,
-              :locals => { :project => @project,
-                           :members => members,
-                           :roles => roles,
-                           :principals => available_principals } %>
-
-  <% end %>
 </div>
 
