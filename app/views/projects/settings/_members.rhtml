@@ -68,7 +68,7 @@
 </div>
 <div>
   <% if roles.any? && available_principals.any? %>
-    <% partial = (User.current.impaired? ? "members/new_member_form_impaired" : "members/new_member_form") %>
+    <% partial = (User.current.impaired? ? "members/member_form_impaired" : "members/member_form") %>
     <%= render :partial => partial,
               :locals => { :project => @project,
                            :members => members,
