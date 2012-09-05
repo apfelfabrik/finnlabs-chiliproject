@@ -21,7 +21,16 @@ class UsersController; def rescue_action(e) raise e end; end
 class UsersControllerTest < ActionController::TestCase
   include Redmine::I18n
 
-  fixtures :users, :projects, :members, :member_roles, :roles, :auth_sources, :custom_fields, :custom_values, :groups_users
+  fixtures :users,
+           :projects,
+           :members,
+           :member_roles,
+           :roles,
+           :auth_sources,
+           :custom_fields,
+           :custom_field_translations,
+           :custom_values,
+           :groups_users
 
   def setup
     @controller = UsersController.new
@@ -179,7 +188,7 @@ class UsersControllerTest < ActionController::TestCase
 
     mail = ActionMailer::Base.deliveries.last
     assert_not_nil mail
-    assert_equal [user.mail], mail.bcc
+    assert_equal [user.mail], mail.to
     assert mail.body.include?('secret')
   end
 
@@ -229,6 +238,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   def test_update_with_activation_should_send_a_notification
+    Setting.available_languages = [:en, :fr]
     u = User.new(:firstname => 'Foo', :lastname => 'Bar', :mail => 'foo.bar@somenet.foo', :language => 'fr')
     u.login = 'foo'
     u.status = User::STATUS_REGISTERED
@@ -240,7 +250,7 @@ class UsersControllerTest < ActionController::TestCase
     assert u.reload.active?
     mail = ActionMailer::Base.deliveries.last
     assert_not_nil mail
-    assert_equal ['foo.bar@somenet.foo'], mail.bcc
+    assert_equal ['foo.bar@somenet.foo'], mail.to
     assert mail.body.include?(ll('fr', :notice_account_activated))
   end
 
@@ -254,7 +264,7 @@ class UsersControllerTest < ActionController::TestCase
 
     mail = ActionMailer::Base.deliveries.last
     assert_not_nil mail
-    assert_equal [u.mail], mail.bcc
+    assert_equal [u.mail], mail.to
     assert mail.body.include?('newpass')
   end
 

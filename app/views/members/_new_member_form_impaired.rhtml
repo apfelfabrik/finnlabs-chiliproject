@@ -12,15 +12,7 @@
                   %>
 
     <div id="principals">
-      <%= render :partial => 'members/autocomplete_for_member', :locals => { :principals => principals } %>
+      <%= render :partial => 'members/autocomplete_for_member', :locals => { :principals => principals, :roles => roles } %>
     </div>
-
-    <p>
-      <%= l(:label_role_plural) %>:
-      <% roles.each do |role| %>
-        <label><%= check_box_tag 'member[role_ids][]', role.id %> <%=h role %></label>
-      <% end %>
-    </p>
-    <p><%= submit_tag l(:button_add), :id => 'member-add-submit' %></p>
   </fieldset>
 <% end %>

@@ -153,6 +153,11 @@ class Role < ActiveRecord::Base
     paginate({ :per_page => limit, :page => page }.merge(registered_scope))
   end
 
+  def self.by_permission(permission)
+    all.select do |role|
+      role.allowed_to? permission
+    end
+  end
 
 private
   def allowed_permissions

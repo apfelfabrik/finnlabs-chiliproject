@@ -270,23 +270,6 @@ module ApplicationHelper
     end
   end
 
-  # Renders the project quick-jump box
-  def render_project_jump_box(projects = [], html_options = {})
-    projects ||= User.current.memberships.collect(&:project).compact.uniq
-    if projects.any?
-      option_tags = (content_tag :option, "", :value => "")
-      option_tags << project_tree_options_for_select(projects, :selected => @project) do |p|
-        { :value => url_for(:controller => 'projects', :action => 'show', :id => p, :jump => current_menu_item) }
-      end
-      html_options[:class] ||= ""
-      html_options[:class] << " select2-select "
-      select_tag "", option_tags, html_options.merge({
-        :onchange => "if (this.value != \'\') { window.location = this.value; }",
-        :title => l(:label_jump_to_a_project)
-      })
-    end
-  end
-
   def project_tree_options_for_select(projects, options = {})
     s = ''
     project_tree(projects) do |project, level|
@@ -314,7 +297,7 @@ module ApplicationHelper
     s = ''
     if projects.any?
       ancestors = []
-      projects.sort_by(&:lft).each do |project|
+      Project.project_tree(projects) do |project, level|
         if (ancestors.empty? || project.is_descendant_of?(ancestors.last))
           s << "<ul>\n"
         else
@@ -385,9 +368,17 @@ module ApplicationHelper
   def pagination_links_full(paginator, count=nil, options={})
     page_param = options.delete(:page_param) || :page
     per_page_links = options.delete(:per_page_links)
-    url_param = params.dup
+    url_param = {}
+
+    action, controller, id, tab = options.delete(:action), options.delete(:controller), options.delete(:id), options.delete(:tab)
+
+    url_param.merge!(:action => action) if action
+    url_param.merge!(:controller => controller) if controller
+    url_param.merge!(:id => id) if id
+    url_param.merge!(:tab => tab) if tab
+
     # don't reuse query params if filters are present
-    url_param.merge!(:fields => nil, :values => nil, :operators => nil) if url_param.delete(:set_filter)
+    url_param.merge!(:fields => nil, :values => nil, :operators => nil) if params.delete(:set_filter)
 
     html = ''
     if paginator.current.previous
@@ -453,7 +444,7 @@ module ApplicationHelper
   end
 
   def link_to_project_ancestors(project)
-    if @project
+    if project && !project.new_record?
       ancestors = (project.root? ? [] : project.ancestors.visible)
       ancestors << project
       ancestors.collect do |p|
@@ -724,7 +715,7 @@ module ApplicationHelper
   #     identifier:version:1.0.0
   #     identifier:source:some/file
   def parse_redmine_links(text, project, obj, attr, only_path, options)
-    text.gsub!(%r{([\s\(,\-\[\>]|^)(!)?(([a-z0-9\-]+):)?(attachment|document|version|commit|source|export|message|project)?((#|r)(\d+)|(:)([^"\s<>][^\s<>]*?|"[^"]+?"))(?=(?=[[:punct:]]\W)|,|\s|\]|<|$)}) do |m|
+    text.gsub!(%r{([\s\(,\-\[\>]|^)(!)?(([a-z0-9\-]+):)?(attachment|document|version|commit|source|export|message|project)?((#+|r)(\d+)|(:)([^"\s<>][^\s<>]*?|"[^"]+?"))(?=(?=[[:punct:]]\W)|,|\s|\]|<|$)}) do |m|
       leading, esc, project_prefix, project_identifier, prefix, sep, identifier = $1, $2, $3, $4, $5, $7 || $9, $8 || $10
       link = nil
       if project_identifier
@@ -765,6 +756,16 @@ module ApplicationHelper
             if p = Project.visible.find_by_id(oid)
               link = link_to_project(p, {:only_path => only_path}, :class => 'project')
             end
+          end
+        elsif sep == '##'
+          oid = identifier.to_i
+          if issue = Issue.visible.find_by_id(oid, :include => :status)
+            link = issue_quick_info(issue)
+          end
+        elsif sep == '###'
+          oid = identifier.to_i
+          if issue = Issue.visible.find_by_id(oid, :include => :status)
+            link = issue_quick_info_with_description(issue)
           end
         elsif sep == ':'
           # removes the double quotes if any
@@ -874,8 +875,17 @@ module ApplicationHelper
   end
 
   def lang_options_for_select(blank=true)
+    auto = if (blank && (valid_languages - all_languages) == (all_languages - valid_languages))
+            [["(auto)", ""]]
+           else
+            []
+          end
+    auto + valid_languages.collect{|lang| [ ll(lang.to_s, :general_lang_name), lang.to_s]}.sort{|x,y| x.last <=> y.last }
+  end
+
+  def all_lang_options_for_select(blank=true)
     (blank ? [["(auto)", ""]] : []) +
-      valid_languages.collect{|lang| [ ll(lang.to_s, :general_lang_name), lang.to_s]}.sort{|x,y| x.last <=> y.last }
+      all_languages.collect{|lang| [ ll(lang.to_s, :general_lang_name), lang.to_s]}.sort{|x,y| x.last <=> y.last }
   end
 
   def label_tag_for(name, option_tags = nil, options = {})
@@ -1061,10 +1071,10 @@ module ApplicationHelper
     @included_in_api_response.include?(arg.to_s)
   end
 
-  # Returns options or nil if nometa param or X-ChiliProject-Nometa header
+  # Returns options or nil if nometa param or X-OpenProject-Nometa header
   # was set in the request
   def api_meta(options)
-    if params[:nometa].present? || request.headers['X-ChiliProject-Nometa']
+    if params[:nometa].present? || request.headers['X-OpenProject-Nometa']
       # compatibility mode for activeresource clients that raise
       # an error when unserializing an array with attributes
       nil
@@ -1102,45 +1112,6 @@ module ApplicationHelper
     javascript_tag("jQuery.menu_expand({ menuItem: '.#{current_menu_class}' });")
   end
 
-  # Menu items for the main top menu
-  def main_top_menu_items
-    split_top_menu_into_main_or_more_menus[:main]
-  end
-
-  # Menu items for the more top menu
-  def more_top_menu_items
-    split_top_menu_into_main_or_more_menus[:more]
-  end
-
-  def help_menu_item
-    split_top_menu_into_main_or_more_menus[:help]
-  end
-
-  # Split the :top_menu into separate :main and :more items
-  def split_top_menu_into_main_or_more_menus
-    unless @top_menu_split
-      items_for_main_level = []
-      items_for_more_level = []
-      help_menu = nil
-      menu_items_for(:top_menu) do |item|
-        if item.name == :home || item.name == :my_page
-          items_for_main_level << item
-        elsif item.name == :help
-          help_menu = item
-        elsif item.name == :projects
-          # Remove, present in layout
-        else
-          items_for_more_level << item
-        end
-      end
-      @top_menu_split = {
-        :main => items_for_main_level,
-        :more => items_for_more_level,
-        :help => help_menu
-      }
-    end
-    @top_menu_split
-  end
 
   def disable_accessibility_css!
     @accessibility_css_disabled = true

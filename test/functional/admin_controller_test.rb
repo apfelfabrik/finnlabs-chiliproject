@@ -36,7 +36,7 @@ class AdminControllerTest < ActionController::TestCase
 
   def test_index_with_no_configuration_data
     delete_configuration_data
-    get :index
+    get :projects
     assert_tag :tag => 'div',
                :attributes => { :class => /nodata/ }
   end
@@ -61,6 +61,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   def test_load_default_configuration_data
+    Setting.available_languages = [:fr]
     delete_configuration_data
     post :default_configuration, :lang => 'fr'
     assert_response :redirect
@@ -74,7 +75,7 @@ class AdminControllerTest < ActionController::TestCase
     mail = ActionMailer::Base.deliveries.last
     assert_kind_of TMail::Mail, mail
     user = User.find(1)
-    assert_equal [user.mail], mail.bcc
+    assert_equal [user.mail], mail.to
   end
 
   def test_no_plugins
@@ -113,12 +114,16 @@ class AdminControllerTest < ActionController::TestCase
 
   def test_admin_menu_plugin_extension
     Redmine::MenuManager.map :admin_menu do |menu|
-      menu.push :test_admin_menu_plugin_extension, '/foo/bar', :caption => 'Test'
+      menu.push :test_admin_menu_plugin_extension,
+                { :controller => 'projects', :action => 'index' },
+                :caption => 'Test'
     end
 
-    get :index
+    User.current = User.find(1)
+
+    get :projects
     assert_response :success
-    assert_tag :a, :attributes => { :href => '/foo/bar' },
+    assert_tag :a, :attributes => { :href => '/projects' },
                    :content => 'Test'
 
     Redmine::MenuManager.map :admin_menu do |menu|

@@ -176,6 +176,8 @@ en:
   notice_unable_delete_time_entry: Unable to delete time log entry.
   notice_issue_done_ratios_updated: Issue done ratios updated.
   notice_gantt_chart_truncated: "The chart was truncated because it exceeds the maximum number of items that can be displayed (%{max})"
+  notice_to_many_principals_to_display: "There are too many results.\nNarrow down the search by typing in the name of the new member (or group)."
+  notice_no_principals_found: "No results found."
 
   error_can_t_load_default_data: "Default configuration could not be loaded: %{value}"
   error_scm_not_found: "The entry or revision was not found in the repository."
@@ -194,6 +196,8 @@ en:
   error_workflow_copy_target: 'Please select target tracker(s) and role(s)'
   error_unable_delete_issue_status: 'Unable to delete issue status'
   error_unable_to_connect: "Unable to connect (%{value})"
+  error_check_user_and_role: "Please choose a user and a role."
+  error_must_be_project_member: "must be project member"
   warning_attachments_not_saved: "%{count} file(s) could not be saved."
 
   mail_subject_lost_password: "Your %{value} password"
@@ -318,6 +322,7 @@ en:
   setting_app_title: Application title
   setting_app_subtitle: Application subtitle
   setting_welcome_text: Welcome text
+  setting_available_languages: Available languages
   setting_default_language: Default language
   setting_login_required: Authentication required
   setting_self_registration: Self-registration
@@ -374,6 +379,8 @@ en:
   setting_commit_logtime_activity_id: Activity for logged time
   setting_gantt_items_limit: Maximum number of items displayed on the gantt chart
   setting_issue_startdate_is_adddate: Use current date as start date for new issues
+  setting_users_deletable_by_admins: User accounts deletable by admins
+  setting_users_deletable_by_self: Users allowed to delete their accounts
 
   permission_add_project: Create project
   permission_add_subprojects: Create subprojects
@@ -467,6 +474,9 @@ en:
   label_issues_by: "Issues by %{value}"
   label_issue_added: Issue added
   label_issue_updated: Issue updated
+  label_sum_for: "Sum for %{value}"
+  label_all_issues: all Issues
+  label_display_sums: Display Sums
   label_document: Document
   label_document_new: New document
   label_document_plural: Documents
@@ -849,6 +859,7 @@ en:
   label_top_menu: Top Menu
   label_main_menu: Side Menu
   label_content: Content
+  label_force_user_language_to_default: Set language of users having a non allowed language to default
 
   button_login: Login
   button_submit: Submit
@@ -1037,10 +1048,37 @@ en:
   description_toc_toggle: Show/Hide table of contents
   description_attachment_toggle: Show/Hide attachments
   description_autocomplete: This field uses autocomplete. While typing the title of an issue you will receive a list of possible candidates. Choose one using the arrow up and arrow down key and select it with tab or enter. Alternatively you can enter the issue number directly.
-  description_noscript: You need to activate JavaScript in order to use Chiliproject!
+  description_noscript: You need to activate JavaScript in order to use OpenProject!
   description_my_project: You are member
   description_parent_issue: Parent issue of current
   description_sub_issue: Subissue of current
   label_issue_hierarchy: "Issue Hierarchy"
   more_actions: More functions
   show_hide_project_menu: Hide/Show project menu
+
+  user:
+    deleted: "Deleted user"
+
+  account:
+    delete: "Delete account"
+    delete_confirmation: "Are you sure you want to delete the account?"
+    deleted: "Account successfully deleted"
+    deletion_info:
+      heading: "Delete account %{name}"
+      info:
+        self: |
+          Deleting your user account is an irreversible action.
+        other: |
+          Deleting the user account is an irreversible action.
+      login_consequences:
+        self: |
+          Your account will be deleted from the system. Therefore, you will no longer be able to log in with your current credentials. If you choose to become a user of this application again, you can do so by using the means this application grants.
+        other: |
+          The account will be deleted from the system. Therefore, the user will no longer be able to log in with his current credentials. He/she can choose to become a user of this application again by the means this application grants.
+      data_consequences:
+        self: |
+          Of the data you created (e.g. e-mail, preferences, issues, wiki entries) as much as possible will be deleted. Note however, that data like issues and wiki entries can not be deleted without impeding the work of the other users. Such data is hence reassigned to an account called "Deleted user". As the data of every deleted account is reassigned to this account it will not be possible to distinguish the data you created from the data of another deleted account.
+        other: |
+          Of the data the user created (e.g. e-mail, preferences, issues, wiki entries) as much as possible will be deleted. Note however, that data like issues and wiki entries can not be deleted without impeding the work of the other users. Such data is hence reassigned to an account called "Deleted user". As the data of every deleted account is reassigned to this account it will not be possible to distinguish the data the user created from the data of another deleted account.
+
+

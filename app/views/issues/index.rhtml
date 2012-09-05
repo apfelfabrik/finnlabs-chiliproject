@@ -33,6 +33,10 @@
 						<td><label for='group_by'><%= l(:field_group_by) %></label></td>
 						<td><%= select_tag('group_by', options_for_select([[]] + @query.groupable_columns.collect {|c| [c.caption, c.name.to_s]}, @query.group_by)) %></td>
 					</tr>
+					<tr>
+						<td><%= label_tag :display_sums, l(:label_display_sums) %></td>
+						<td><%= check_box_tag :display_sums, 1, @query.display_sums? %></td>
+					</tr>
 				</table>
       <%= call_hook(:view_issue_query_form_options_bottom, :query => @query) %>
 			</div>
@@ -76,7 +80,7 @@
 	<%= f.link_to 'Atom', :url => { :project_id => @project, :query_id => (@query.new_record? ? nil : @query), :key => User.current.rss_key } %>
 	<%= f.link_to 'CSV', :url => { :project_id => @project } %>
 	<%= f.link_to 'PDF', :url => { :project_id => @project } %>
-<% end if User.current.allowed_to? :export_issues, @project %>
+  <% end if User.current.allowed_to? :export_issues, @project, :global => @project.nil? %>
 
 <% end %>
 <%= call_hook(:view_issues_index_bottom, { :issues => @issues, :project => @project, :query => @query }) %>
