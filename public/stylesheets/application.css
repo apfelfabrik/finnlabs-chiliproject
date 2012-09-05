@@ -162,8 +162,6 @@ table.files tr.file td { text-align: center; }
 table.files tr.file td.filename { text-align: left; padding-left: 24px; }
 table.files tr.file td.digest { font-size: 80%; }
 
-table.members td.roles, table.memberships td.roles { width: 45%; }
-
 tr.message { height: 2.6em; }
 tr.message td.created_on { white-space: nowrap; }
 tr.message td.last_message { white-space: nowrap; }
