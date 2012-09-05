@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  before_filter :user_setup, :check_if_login_required, :set_localization
+  before_filter :user_setup, :check_if_login_required, :reset_i18n_fallbacks, :set_localization
   filter_parameter_logging :password
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :invalid_authenticity_token
@@ -129,6 +129,12 @@ class ApplicationController < ActionController::Base
     require_login if Setting.login_required?
   end
 
+  def reset_i18n_fallbacks
+    return if I18n.fallbacks.defaults == (fallbacks = [I18n.default_locale] + Setting.available_languages.map(&:to_sym))
+    I18n.fallbacks = nil
+    I18n.fallbacks.defaults = fallbacks
+  end
+
   def set_localization
     lang = nil
     if User.current.logged?
@@ -156,9 +162,9 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         format.html { redirect_to :controller => "account", :action => "login", :back_url => url }
         format.atom { redirect_to :controller => "account", :action => "login", :back_url => url }
-        format.xml  { head :unauthorized, 'WWW-Authenticate' => 'Basic realm="ChiliProject API"' }
-        format.js   { head :unauthorized, 'WWW-Authenticate' => 'Basic realm="ChiliProject API"' }
-        format.json { head :unauthorized, 'WWW-Authenticate' => 'Basic realm="ChiliProject API"' }
+        format.xml  { head :unauthorized, 'WWW-Authenticate' => 'Basic realm="OpenProject API"' }
+        format.js   { head :unauthorized, 'WWW-Authenticate' => 'Basic realm="OpenProject API"' }
+        format.json { head :unauthorized, 'WWW-Authenticate' => 'Basic realm="OpenProject API"' }
       end
       return false
     end
@@ -463,8 +469,8 @@ class ApplicationController < ActionController::Base
   def api_key_from_request
     if params[:key].present?
       params[:key]
-    elsif request.headers["X-ChiliProject-API-Key"].present?
-      request.headers["X-ChiliProject-API-Key"]
+    elsif request.headers["X-OpenProject-API-Key"].present?
+      request.headers["X-OpenProject-API-Key"]
     end
   end
 

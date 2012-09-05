@@ -34,6 +34,7 @@ class IssuesControllerTest < ActionController::TestCase
            :attachments,
            :workflows,
            :custom_fields,
+           :custom_field_translations,
            :custom_values,
            :custom_fields_projects,
            :custom_fields_trackers,
@@ -189,6 +190,7 @@ class IssuesControllerTest < ActionController::TestCase
 
   def test_index_csv_with_project
     Setting.default_language = 'en'
+    Role.anonymous.add_permission!(:export_issues)
 
     get :index, :format => 'csv'
     assert_response :success
@@ -203,6 +205,8 @@ class IssuesControllerTest < ActionController::TestCase
   end
 
   def test_index_pdf
+    Role.anonymous.add_permission!(:export_issues)
+
     get :index, :format => 'pdf'
     assert_response :success
     assert_not_nil assigns(:issues)
@@ -220,6 +224,8 @@ class IssuesControllerTest < ActionController::TestCase
   end
 
   def test_index_pdf_with_query_grouped_by_list_custom_field
+    Role.anonymous.add_permission!(:export_issues)
+
     get :index, :project_id => 1, :query_id => 9, :format => 'pdf'
     assert_response :success
     assert_not_nil assigns(:issues)
@@ -327,11 +333,10 @@ class IssuesControllerTest < ActionController::TestCase
   end
 
   def test_show_atom
-    get :show, :id => 2, :format => 'atom'
+    get :show, :id => 1, :format => 'atom'
     assert_response :success
     assert_template 'journals/index.rxml'
-    # Inline image
-    assert_select 'content', :text => Regexp.new(Regexp.quote('http://test.host/attachments/download/10'))
+    assert_select 'content', :text => Regexp.new(Regexp.quote('http://test.host/issues/2'))
   end
 
   def test_show_export_to_pdf
@@ -521,9 +526,8 @@ class IssuesControllerTest < ActionController::TestCase
     assert_equal [2, 3], issue.watcher_user_ids.sort
     assert issue.watched_by?(User.find(3))
     # Watchers notified
-    mail = ActionMailer::Base.deliveries.last
-    assert_kind_of TMail::Mail, mail
-    assert [mail.bcc, mail.cc].flatten.include?(User.find(3).mail)
+    recipients = ActionMailer::Base.deliveries.collect(&:to)
+    assert recipients.flatten.include?(User.find(3).mail)
   end
 
   def test_post_create_subissue
@@ -568,7 +572,7 @@ class IssuesControllerTest < ActionController::TestCase
     end
     assert_redirected_to :controller => 'issues', :action => 'show', :id => Issue.last.id
 
-    assert_equal 1, ActionMailer::Base.deliveries.size
+    assert_equal 2, ActionMailer::Base.deliveries.size
   end
 
   def test_post_create_should_preserve_fields_values_on_validation_failure
@@ -1001,7 +1005,7 @@ class IssuesControllerTest < ActionController::TestCase
                                      :priority_id => '6',
                                      :category_id => '1' # no change
                                     }
-    assert_equal 1, ActionMailer::Base.deliveries.size
+    assert_equal 2, ActionMailer::Base.deliveries.size
   end
 
   def test_put_update_should_not_send_a_notification_if_send_notification_is_off
@@ -1224,7 +1228,7 @@ class IssuesControllerTest < ActionController::TestCase
          })
 
     assert_response 302
-    assert_equal 2, ActionMailer::Base.deliveries.size
+    assert_equal 5, ActionMailer::Base.deliveries.size
   end
 
   def test_bulk_update_status

@@ -191,6 +191,8 @@ de:
   notice_unable_delete_version: Die Version konnte nicht gelöscht werden.
   notice_unable_delete_time_entry: Der Zeiterfassungseintrag konnte nicht gelöscht werden.
   notice_issue_done_ratios_updated: Der Ticket-Fortschritt wurde aktualisiert.
+  notice_to_many_principals_to_display: "Es gibt zu viele Treffer.\nBitte engen Sie die Suche ein, indem sie den Namen der Person (oder der Gruppe) eingeben."
+  notice_no_principals_found: "Keine Treffer gefunden."
 
   error_can_t_load_default_data: "Die Standard-Konfiguration konnte nicht geladen werden: %{value}"
   error_scm_not_found: Eintrag und/oder Revision existiert nicht im Projektarchiv.
@@ -209,6 +211,8 @@ de:
   error_workflow_copy_target: Bitte wählen Sie die Ziel-Tracker und -Rollen.
   error_unable_delete_issue_status: "Der Ticket-Status konnte nicht gelöscht werden."
   error_unable_to_connect: Fehler beim Verbinden (%{value})
+  error_check_user_and_role: "Bitte wählen Sie einen Nutzer und eine Rolle."
+  error_must_be_project_member: "muss Mitglied des Projekts sein"
   warning_attachments_not_saved: "%{count} Datei(en) konnten nicht gespeichert werden."
 
   mail_subject_lost_password: "Ihr %{value} Kennwort"
@@ -326,6 +330,7 @@ de:
   setting_app_title: Applikations-Titel
   setting_app_subtitle: Applikations-Untertitel
   setting_welcome_text: Willkommenstext
+  setting_available_languages: Verfügbare Sprachen
   setting_default_language: Default-Sprache
   setting_login_required: Authentifizierung erforderlich
   setting_self_registration: Anmeldung ermöglicht
@@ -377,6 +382,8 @@ de:
   setting_rest_api_enabled: REST-Schnittstelle aktivieren
   setting_cache_formatted_text: Formatierten Text im Cache speichern
   setting_issue_startdate_is_adddate: Neue Tickets haben "Heute" als Anfangsdatum
+  setting_users_deletable_by_admins: Admins können Nutzeraccounts löschen
+  setting_users_deletable_by_self: Nutzer können ihren Account löschen
 
   permission_add_project: Projekt erstellen
   permission_add_subprojects: Unterprojekte erstellen
@@ -470,6 +477,9 @@ de:
   label_issues_by: "Tickets von %{value}"
   label_issue_added: Ticket hinzugefügt
   label_issue_updated: Ticket aktualisiert
+  label_sum_for: "Summe für %{value}"
+  label_all_issues: alle Tickets
+  label_display_sums: Summen anzeigen
   label_document: Dokument
   label_document_new: Neues Dokument
   label_document_plural: Dokumente
@@ -834,6 +844,7 @@ de:
   label_top_menu: Hauptmenu
   label_main_menu: Nebenmenu
   label_content: Inhalt
+  label_force_user_language_to_default: Setze Sprache für Nutzer die eine nicht erlaubte Sprache gewählt haben auf die Default-Sprache
 
   button_login: Anmelden
   button_submit: OK
@@ -1056,10 +1067,35 @@ de:
   description_toc_toggle: Inhaltsverzeichnis aus/einblenden
   description_attachment_toggle: Dateien aus/einblenden
   description_autocomplete: Für dieses Feld werden sie mit einer Autovervollständigung unterstützt. Sie können einen Teil des Tickettitels schreiben und bekommen eine Liste von möglichen Tickets angezeigt. Wählen Sie mit den Pfeiltasten den gewünschten Eintrag und bestätigen Sie mit Tab oder Enter. Sie können aber auch die Ticketnummer direkt eintragen.
-  description_noscript: Sie müssen JavaScript aktiveren, um Chiliproject nutzen zu können!
+  description_noscript: Sie müssen JavaScript aktiveren, um OpenProject nutzen zu können!
   description_my_project: Sie sind Mitglied
   description_parent_issue: Übergeordnetes Ticket
   description_sub_issue: Untergeordnetes Ticket
   label_issue_hierarchy: "Tickethierarchie"
   more_actions: Weitere Funktionen
   show_hide_project_menu: Projektnavigation aus/einblenden
+
+  user:
+    deleted: "Gelöschter Nutzer"
+
+  account:
+    delete: "Account löschen"
+    delete_confirmation: "Sind sie sicher, dass die den Account löschen wollen?"
+    deleted: "Account erfolgreich gelöscht"
+    deletion_info:
+      heading: "Lösche account %{name}"
+      info:
+        self: |
+          Das Löschen ihres Accounts kann nicht rückgängig gemacht werden.
+        other: |
+          Das Löschen des Accounts kann nicht rückgängig gemacht werden.
+      login_consequences:
+        self: |
+          Ihr Account wird aus dem System entfernt. Sie werden daher nicht mehr in der Lage, sein sich mit ihrem derzeitigen Nutzernamen und Passwort anzumelden. Sofern Sie es wünschen, können sie sich über die von der Anwendung zur Verfügung gestellten Mechanismen einen neuen Account zulegen.
+        other: |
+          Der Account wird aus dem System entfernt. Der Nutzer wird daher nicht mehr in der Lage sein, sich mit seinem derzeitigen Nutzernamen und Passwort anzumelden. Sofern der Nutzer es wünscht, kann er sich über die von der Anwendung zur Verfügung gestellten Mechanismen einen neuen Account zulegen.
+      data_consequences:
+        self: |
+          Von den von Ihnen im Zuge der Nutzung der Anwendung erstellen Daten (z.B. E-Mail-Adresse, Systemeinstellungen, Tickets, Wiki-Einträgen) werden so viele wie möglich gelöscht. Bitte beachten Sie allerdings, dass Daten wie Tickets und Wiki-Einträge nicht gelöscht werden können, da dies die Arbeit der anderen Nutzer behindern würde. Solche Daten werden daher einem "Gelöschten Nutzer" zugewiesen. Da die Daten aller gelöschter Accounts dem "Gelöschten Nutzer" zugewiesen werden ist es unmöglich die von ihnen erstellten Daten auf Ihre Person zurückzuführen.
+        other: |
+          Von den vom Nutzer im Zuge der Nutzung der Anwendung erstellen Daten (z.B. E-Mail-Adresse, Systemeinstellungen, Tickets, Wiki-Einträgen) werden so viele wie möglich gelöscht. Bitte beachten Sie allerdings, dass Daten wie Tickets und Wiki-Einträge nicht gelöscht werden können, da dies die Arbeit der anderen Nutzer behindern würde. Solche Daten werden daher einem "Gelöschten Nutzer" zugewiesen. Da die Daten aller gelöschter Accounts dem "Gelöschten Nutzer" zugewiesen werden ist es unmöglich die von Nutzer erstellten Daten auf seine Person zurückzuführen.

@@ -61,6 +61,8 @@ class Issue < ActiveRecord::Base
 
   DONE_RATIO_OPTIONS = %w(issue_field issue_status)
 
+  attr_protected :project_id, :author_id
+
   validates_presence_of :subject, :priority, :project, :tracker, :author, :status
 
   validates_length_of :subject, :maximum => 255
@@ -119,7 +121,8 @@ class Issue < ActiveRecord::Base
 
   def copy_from(arg)
     issue = arg.is_a?(Issue) ? arg : Issue.visible.find(arg)
-    self.attributes = issue.attributes.dup.except("id", "root_id", "parent_id", "lft", "rgt", "created_on", "updated_on")
+    # attributes don't come from form, so it's save to force assign
+    self.force_attributes = issue.attributes.dup.except("id", "root_id", "parent_id", "lft", "rgt", "created_on", "updated_on")
     self.parent_issue_id = issue.parent_id if issue.parent_id
     self.custom_field_values = issue.custom_field_values.inject({}) {|h,v| h[v.custom_field_id] = v.value; h}
     self.status = issue.status
@@ -153,6 +156,11 @@ class Issue < ActiveRecord::Base
         issue.fixed_version = nil
       end
       issue.project = new_project
+
+      if !Setting.cross_project_issue_relations? &&
+         parent && parent.project_id != project_id
+        self.parent_issue_id = nil
+      end
     end
     if new_tracker
       issue.tracker = new_tracker
@@ -337,7 +345,9 @@ class Issue < ActiveRecord::Base
 
     # Checks parent issue assignment
     if @parent_issue
-      if !new_record?
+      if !Setting.cross_project_issue_relations? && @parent_issue.project_id != self.project_id
+        errors.add :parent_issue_id, :not_a_valid_parent
+      elsif !new_record?
         # moving an existing issue
         if @parent_issue.root_id != root_id
           # we can always move to another tree
@@ -560,7 +570,7 @@ class Issue < ActiveRecord::Base
     s << ' assigned-to-me' if User.current.logged? && assigned_to_id == User.current.id
     s
   end
-  
+
   # Saves an issue, time_entry, attachments, and a journal from the parameters
   # Returns false if save fails
   def save_issue_with_child_records(params, existing_time_entry=nil)
@@ -590,16 +600,16 @@ class Issue < ActiveRecord::Base
         rescue ActiveRecord::StaleObjectError
           attachments[:files].each(&:destroy)
           error_message = l(:notice_locking_conflict)
-          
+
           journals_since = self.journals.after(lock_version)
-          
+
           if journals_since.any?
             changes = journals_since.map { |j| "#{j.user.name} (#{j.created_at.to_s(:short)})" }
             error_message << " " << l(:notice_locking_conflict_additional_information, :users => changes.join(', '))
           end
 
           error_message << " " << l(:notice_locking_conflict_reload_page)
-          
+
           errors.add_to_base error_message
           raise ActiveRecord::Rollback
         end

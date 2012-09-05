@@ -109,6 +109,10 @@ class Project < ActiveRecord::Base
     errors[:identifier].nil? && !(new_record? || identifier.blank?)
   end
 
+  def possible_members(criteria, limit)
+    Principal.active_or_registered.like(criteria).not_in_project(self).find(:all, :limit => limit)
+  end
+
   # returns latest created projects
   # non public projects will be returned only if user is a member of those
   def self.latest(user=nil, count=5)
@@ -617,16 +621,58 @@ class Project < ActiveRecord::Base
     end
   end
 
-  # Yields the given block for each project with its level in the tree
-  def self.project_tree(projects, &block)
+  # builds up a project hierarchy helper structure for use with #project_tree_from_hierarchy
+  #
+  # it expects a simple list of projects with a #lft column (awesome_nested_set)
+  # and returns a hierarchy based on #lft
+  #
+  # the result is a nested list of root level projects that contain their child projects
+  # but, each entry is actually a ruby hash wrapping the project and child projects
+  # the keys are :project and :children where :children is in the same format again
+  #
+  #   result = [ root_level_project_info_1, root_level_project_info_2, ... ]
+  #
+  # where each entry has the form
+  #
+  #   project_info = { :project => the_project, :children => [ child_info_1, child_info_2, ... ] }
+  #
+  # if a project has no children the :children array is just empty
+  #
+  def self.build_projects_hierarchy(projects)
     ancestors = []
+    result    = []
+
     projects.sort_by(&:lft).each do |project|
-      while (ancestors.any? && !project.is_descendant_of?(ancestors.last))
+      while ancestors.any? && !project.is_descendant_of?(ancestors.last[:project])
+        # before we pop back one level, we sort the child projects by name
+        ancestors.last[:children] = ancestors.last[:children].sort_by { |h| h[:project].name.downcase if h[:project].name }
         ancestors.pop
       end
-      yield project, ancestors.size
-      ancestors << project
+
+      current_hierarchy = { :project => project, :children => [] }
+      current_tree      = ancestors.any? ? ancestors.last[:children] : result
+
+      current_tree << current_hierarchy
+      ancestors    << current_hierarchy
     end
+
+    # at the end the root level must be sorted as well
+    result.sort_by { |h| h[:project].name.downcase if h[:project].name }
+  end
+
+  def self.project_tree_from_hierarchy(projects_hierarchy, level, &block)
+    projects_hierarchy.each do |hierarchy|
+      project, children = hierarchy[:project], hierarchy[:children]
+      yield project, level
+      # recursively show children
+      project_tree_from_hierarchy(children, level + 1, &block) if children.any?
+    end
+  end
+
+  # Yields the given block for each project with its level in the tree
+  def self.project_tree(projects, &block)
+    projects_hierarchy = build_projects_hierarchy(projects)
+    project_tree_from_hierarchy(projects_hierarchy, 0, &block)
   end
 
   private
@@ -671,7 +717,7 @@ class Project < ActiveRecord::Base
   def copy_issue_categories(project)
     project.issue_categories.each do |issue_category|
       new_issue_category = IssueCategory.new
-      new_issue_category.attributes = issue_category.attributes.dup.except("id", "project_id")
+      new_issue_category.send(:attributes=, issue_category.attributes.dup.except("id", "project_id"), false)
       self.issue_categories << new_issue_category
     end
   end
@@ -753,7 +799,7 @@ class Project < ActiveRecord::Base
 
     members_to_copy.each do |member|
       new_member = Member.new
-      new_member.attributes = member.attributes.dup.except("id", "project_id", "created_on")
+      new_member.send(:attributes=, member.attributes.dup.except("id", "project_id", "created_on"), false)
       # only copy non inherited roles
       # inherited roles will be added when copying the group membership
       role_ids = member.member_roles.reject(&:inherited?).collect(&:role_id)

@@ -16,7 +16,8 @@ require File.expand_path('../../test_helper', __FILE__)
 class ChangesetTest < ActiveSupport::TestCase
   fixtures :projects, :repositories, :issues, :issue_statuses,
            :changesets, :changes, :issue_categories, :enumerations,
-           :custom_fields, :custom_values, :users, :members, :member_roles, :trackers
+           :custom_fields, :custom_field_translations, :custom_values,
+           :users, :members, :member_roles, :trackers
 
   def setup
     super
@@ -38,7 +39,7 @@ class ChangesetTest < ActiveSupport::TestCase
     fixed = Issue.find(1)
     assert fixed.closed?
     assert_equal 90, fixed.done_ratio
-    assert_equal 1, ActionMailer::Base.deliveries.size
+    assert_equal 2, ActionMailer::Base.deliveries.size
   end
 
   def test_ref_keywords
