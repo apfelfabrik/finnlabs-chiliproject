@@ -19,6 +19,8 @@ class MembersController < ApplicationController
   before_filter :find_project, :only => [:new, :autocomplete_for_member]
   before_filter :authorize
 
+  TAB_SCRIPTS = 'hideOnLoad(); init_members_cb();'
+
   def new
     members = []
     if params[:member] && request.post?
@@ -40,7 +42,7 @@ class MembersController < ApplicationController
         format.js {
           render(:update) {|page|
             page.replace_html "tab-content-members", :partial => 'projects/settings/members'
-            page << 'hideOnLoad(); init_members_cb();'
+            page << TAB_SCRIPTS
             members.each {|member| page.visual_effect(:highlight, "member-#{member.id}") }
           }
         }
@@ -67,7 +69,7 @@ class MembersController < ApplicationController
         format.js {
           render(:update) {|page|
             page.replace_html "tab-content-members", :partial => 'projects/settings/members'
-            page << 'hideOnLoad()'
+            page << TAB_SCRIPTS
             page.visual_effect(:highlight, "member-#{@member.id}")
           }
         }
@@ -83,7 +85,7 @@ class MembersController < ApplicationController
       format.html { redirect_to :controller => 'projects', :action => 'settings', :tab => 'members', :id => @project }
       format.js { render(:update) {|page|
           page.replace_html "tab-content-members", :partial => 'projects/settings/members'
-          page << 'hideOnLoad()'
+          page << TAB_SCRIPTS
         }
       }
     end
