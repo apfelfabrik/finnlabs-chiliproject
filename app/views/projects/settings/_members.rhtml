@@ -1,6 +1,5 @@
 <%= error_messages_for 'member' %>
 <% roles = Role.find_all_givable
-   members = @project.member_principals.find(:all, :include => [:roles, :principal]).sort
    available_principals = Principal.possible_members("", 100) - @project.principals
 
    member_per_page = 20
@@ -11,9 +10,16 @@
                           :limit  =>  @members_pages.items_per_page,
                           :offset =>  @members_pages.current.offset,
                           :include => [:roles, :principal, :member_roles],
-                          :order => User::USER_FORMATS_STRUCTURE[Setting.user_format].map{|attr| attr.to_s}.join(", ")
-%>
-
+                          :order => User::USER_FORMATS_STRUCTURE[Setting.user_format].map{|attr| attr.to_s}.join(", ") %>
+						  
+<div>
+  <% if roles.any? && available_principals.any? %>
+    <%= render :partial => "members/member_form",
+               :locals => { :project => @project,
+                            :roles => roles,
+                            :principals => available_principals } %>
+  <% end %>
+</div>>
 <div>
 <% if @members.any? %>
   <% authorized = authorize_for('members', 'edit') %>
@@ -65,14 +71,5 @@
 <% else %>
   <p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>
-</div>
-
-<div>
-  <% if roles.any? && available_principals.any? %>
-    <%= render :partial => "members/member_form",
-               :locals => { :project => @project,
-                            :roles => roles,
-                            :principals => available_principals } %>
-  <% end %>
 </div>
 
