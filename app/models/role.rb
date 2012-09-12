@@ -23,9 +23,7 @@ class Role < ActiveRecord::Base
     { :conditions => "#{compare} builtin = 0" }
   }
   named_scope :like, lambda { |q|
-    s = "%#{q.to_s.strip.downcase}%"
-    {:conditions => ["LOWER(name) LIKE :s", {:s => s}]
-    }
+    { :conditions => ["LOWER(name) LIKE :s", {:s => "%#{q.to_s.strip.downcase}%"}] }
   }
 
   before_destroy :check_deletable
