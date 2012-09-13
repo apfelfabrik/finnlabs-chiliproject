@@ -12,6 +12,12 @@ class CreateWikiMenuItemForExistingWikis < ActiveRecord::Migration
 
       menu_item.save!
     end
+
+    if Wiki.new.respond_to?(:show_default_tab)
+      change_table :wikis do |t|
+        t.remove :show_default_tab
+      end
+    end
   end
 
   def self.down

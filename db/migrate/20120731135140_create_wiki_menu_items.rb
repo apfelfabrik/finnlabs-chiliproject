@@ -6,10 +6,6 @@ class CreateWikiMenuItems < ActiveRecord::Migration
       add_column :wiki_menu_items, :parent_id, :integer
       add_column :wiki_menu_items, :options, :text
       remove_column :wiki_menu_items, :active
-
-      change_table :wikis do |t|
-        t.remove :show_default_tab
-      end
     else
       create_table :wiki_menu_items do |t|
         t.column :name, :string
