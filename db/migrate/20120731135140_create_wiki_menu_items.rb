@@ -20,7 +20,6 @@ class CreateWikiMenuItems < ActiveRecord::Migration
         t.belongs_to :wiki
       end
     end
-      add_column :wiki_menu_items, :options, :string
   end
 
   def self.down
