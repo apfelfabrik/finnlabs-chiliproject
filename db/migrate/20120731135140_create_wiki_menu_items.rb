@@ -19,6 +19,6 @@ class CreateWikiMenuItems < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :wiki_menu_items
+    puts "You cannot safely undo this migration!"
   end
 end
