@@ -40,7 +40,8 @@
         return;
     }
 
-    var KEY, AbstractSelect2, SingleSelect2, MultiSelect2, nextUid, sizer;
+    var KEY, AbstractSelect2, SingleSelect2, MultiSelect2, nextUid, sizer,
+        lastMousePosition, $document;
 
     KEY = {
         TAB: 9,
@@ -89,6 +90,8 @@
             return k >= 112 && k <= 123;
         }
     };
+
+    $document = $(document);
 
     nextUid=(function() { var counter=1; return function() { return counter++; }; }());
 
@@ -162,8 +165,8 @@
         });
     }
 
-    $(document).delegate("*", "mousemove", function (e) {
-        $.data(document, "select2-lastpos", {x: e.pageX, y: e.pageY});
+    $document.bind("mousemove", function (e) {
+        lastMousePosition = {x: e.pageX, y: e.pageY};
     });
 
     /**
@@ -174,7 +177,7 @@
      */
     function installFilteredMouseMove(element) {
 	    element.bind("mousemove", function (e) {
-            var lastpos = $.data(document, "select2-lastpos");
+            var lastpos = lastMousePosition;
             if (lastpos === undefined || lastpos.x !== e.pageX || lastpos.y !== e.pageY) {
                 $(e.target).trigger("mousemove-filtered", e);
             }
@@ -226,6 +229,10 @@
     function killEvent(event) {
         event.preventDefault();
         event.stopPropagation();
+    }
+    function killEventImmediately(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
     }
 
     function measureTextWidth(e) {
@@ -493,16 +500,16 @@
      *
      * also takes care of clicks on label tags that point to the source element
      */
-    $(document).ready(function () {
-        $(document).delegate("*", "mousedown touchend", function (e) {
+    $document.ready(function () {
+        $document.bind("mousedown touchend", function (e) {
             var target = $(e.target).closest("div.select2-container").get(0), attr;
             if (target) {
-                $(document).find("div.select2-container-active").each(function () {
+                $document.find("div.select2-container-active").each(function () {
                     if (this !== target) $(this).data("select2").blur();
                 });
             } else {
                 target = $(e.target).closest("div.select2-drop").get(0);
-                $(document).find("div.select2-drop-active").each(function () {
+                $document.find("div.select2-drop-active").each(function () {
                     if (this !== target) $(this).data("select2").blur();
                 });
             }
@@ -568,7 +575,7 @@
             this.body = thunk(function() { return opts.element.closest("body"); });
 
             if (opts.element.attr("class") !== undefined) {
-                this.container.addClass(opts.element.attr("class"));
+                this.container.addClass(opts.element.attr("class").replace(/validate\[[\S ]+] ?/, ''));
             }
 
             this.container.css(evaluate(opts.containerCss));
@@ -692,7 +699,7 @@
 
                             result=results[i];
                             selectable=id(result) !== undefined;
-                            compound=("children" in result) && result.children.length > 0;
+                            compound=result.children && result.children.length > 0;
 
                             node=$("<li></li>");
                             node.addClass("select2-results-dept-"+depth);
@@ -833,6 +840,11 @@
             // some validation frameworks ignore the change event and listen instead to keyup, click for selects
             // so here we trigger the click event manually
             this.opts.element.click();
+
+            // ValidationEngine ignorea the change event and listens instead to blur
+            // so here we trigger the blur event manually if so desired
+            if (this.opts.blurOnChange)
+                this.opts.element.blur();
         },
 
 
@@ -867,14 +879,24 @@
                 dropHeight = this.dropdown.outerHeight(),
                 viewportBottom = $(window).scrollTop() + document.documentElement.clientHeight,
                 dropTop = offset.top + height,
+                dropLeft = offset.left,
                 enoughRoomBelow = dropTop + dropHeight <= viewportBottom,
                 enoughRoomAbove = (offset.top - dropHeight) >= this.body().scrollTop(),
                 aboveNow = this.dropdown.hasClass("select2-drop-above"),
+                bodyOffset,
                 above,
                 css;
 
             // console.log("below/ droptop:", dropTop, "dropHeight", dropHeight, "sum", (dropTop+dropHeight)+" viewport bottom", viewportBottom, "enough?", enoughRoomBelow);
             // console.log("above/ offset.top", offset.top, "dropHeight", dropHeight, "top", (offset.top-dropHeight), "scrollTop", this.body().scrollTop(), "enough?", enoughRoomAbove);
+
+            // fix positioning when body has an offset and is not position: static
+
+            if (this.body().css('position') !== 'static') {
+                bodyOffset = this.body().offset();
+                dropTop -= bodyOffset.top;
+                dropLeft -= bodyOffset.left;
+            }
 
             // always prefer the current above/below alignment, unless there is not enough room
 
@@ -898,7 +920,7 @@
 
             css = $.extend({
                 top: dropTop,
-                left: offset.left,
+                left: dropLeft,
                 width: width
             }, evaluate(this.opts.dropdownCss));
 
@@ -911,7 +933,7 @@
 
             if (this.opened()) return false;
 
-            event = jQuery.Event("open");
+            event = $.Event("open");
             this.opts.element.trigger(event);
             return !event.isDefaultPrevented();
         },
@@ -957,13 +979,18 @@
                 });
             });
 
-            $(window).bind(resize, function() {
-                var s2 = $(selector);
-                if (s2.length == 0) {
-                    $(window).unbind(resize);
-                }
-                s2.select2("close");
-            });
+            window.setTimeout(function() {
+                // this is done inside a timeout because IE will sometimes fire a resize event while opening
+                // the dropdown and that causes this handler to immediately close it. this way the dropdown
+                // has a chance to fully open before we start listening to resize events
+                $(window).bind(resize, function() {
+                    var s2 = $(selector);
+                    if (s2.length == 0) {
+                        $(window).unbind(resize);
+                    }
+                    s2.select2("close");
+                })
+            }, 10);
 
             this.clearDropdownAlignmentPreference();
 
@@ -1005,7 +1032,7 @@
             this.results.empty();
             this.clearSearch();
 
-            this.opts.element.trigger(jQuery.Event("close"));
+            this.opts.element.trigger($.Event("close"));
         },
 
         // abstract
@@ -1470,6 +1497,15 @@
                 window.setTimeout(this.bind(function() { this.selection.attr("tabIndex", this.opts.element.attr("tabIndex")); }), 10);
             }));
 
+            selection.delegate("abbr", "mousedown", this.bind(function (e) {
+                if (!this.enabled) return;
+                this.clear();
+                killEventImmediately(e);
+                this.close();
+                this.triggerChange();
+                this.selection.focus();
+            }));
+
             selection.bind("mousedown", this.bind(function (e) {
                 clickingInside = true;
 
@@ -1501,64 +1537,25 @@
             selection.bind("keydown", this.bind(function(e) {
                 if (!this.enabled) return;
 
-                if (e.which === KEY.PAGE_UP || e.which === KEY.PAGE_DOWN) {
-                    // prevent the page from scrolling
+                if (e.which == KEY.DOWN || e.which == KEY.UP
+                    || (e.which == KEY.ENTER && this.opts.openOnEnter)) {
+                    this.open();
                     killEvent(e);
                     return;
                 }
 
-                if (e.which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e)
-                 || e.which === KEY.ESC) {
-                    return;
-                }
-
-                if (this.opts.openOnEnter === false && e.which === KEY.ENTER) {
-                    return;
-                }
-
-                if (e.which == KEY.DELETE) {
+                if (e.which == KEY.DELETE || e.which == KEY.BACKSPACE) {
                     if (this.opts.allowClear) {
                         this.clear();
                     }
-                    return;
-                }
-
-                this.open();
-
-                if (e.which === KEY.ENTER) {
-                    // do not propagate the event otherwise we open, and propagate enter which closes
                     killEvent(e);
                     return;
                 }
-
-                // do not set the search input value for non-alpha-numeric keys
-                // otherwise pressing down results in a '(' being set in the search field
-                if (e.which < 48 ) { // '0' == 48
-                    killEvent(e);
-                    return;
-                }
-
-                var keyWritten = String.fromCharCode(e.which).toLowerCase();
-
-                if (e.shiftKey) {
-                    keyWritten = keyWritten.toUpperCase();
-                }
-
-                // focus the field before calling val so the cursor ends up after the value instead of before
-                this.search.focus();
-                this.search.val(keyWritten);
-
-                // prevent event propagation so it doesnt replay on the now focussed search field and result in double key entry
-                killEvent(e);
             }));
-
-            selection.delegate("abbr", "mousedown", this.bind(function (e) {
-                if (!this.enabled) return;
-                this.clear();
-                killEvent(e);
-                this.close();
-                this.triggerChange();
-                this.selection.focus();
+            selection.bind("keypress", this.bind(function(e) {
+                var key = String.fromCharCode(e.which);
+                this.search.val(key);
+                this.open();
             }));
 
             this.setPlaceholder();
@@ -1865,8 +1862,11 @@
 
             this.search.bind("keyup", this.bind(this.resizeSearch));
 
-            this.search.bind("blur", this.bind(function() {
+            this.search.bind("blur", this.bind(function(e) {
                 this.container.removeClass("select2-container-active");
+                this.search.removeClass("select2-focused");
+                this.clearSearch();
+                e.stopImmediatePropagation();
             }));
 
             this.container.delegate(selector, "mousedown", this.bind(function (e) {
@@ -2343,12 +2343,12 @@
             return markup.join("");
         },
         formatSelection: function (data, container) {
-            return data.text;
+            return data ? data.text : undefined;
         },
         formatResultCssClass: function(data) {return undefined;},
         formatNoMatches: function () { return "No matches found"; },
         formatInputTooShort: function (input, min) { return "Please enter " + (min - input.length) + " more characters"; },
-        formatSelectionTooBig: function (limit) { return "You can only select " + limit + " items"; },
+        formatSelectionTooBig: function (limit) { return "You can only select " + limit + " item" + (limit == 1 ? "" : "s"); },
         formatLoadMore: function (pageNumber) { return "Loading more results..."; },
         formatSearching: function () { return "Searching..."; },
         minimumResultsForSearch: 0,
@@ -2366,7 +2366,8 @@
                 return markup.replace(/&/g, "&amp;");
             }
             return markup;
-        }
+        },
+        blurOnChange: false
     };
 
     // exports
