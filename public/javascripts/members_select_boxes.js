@@ -15,6 +15,28 @@ jQuery(document).ready(function($) {
           }
           fakeInput = $(elem).after("<input type='hidden'></input>").siblings(":input:first");
           fakeInput.attr(attributes);
+
+          formatItems = function (item, container, query) {
+            var match = item.name.toUpperCase().indexOf(query.term.toUpperCase()),
+            tl = query.term.length,
+            markup = [];
+
+            if (match < 0) {
+              return "<span data-value='" + item.id + "'>" + item.name + "</span>";
+            }
+
+            markup.push(item.name.substring(0, match));
+            markup.push("<span class='select2-match' data-value='" + item.id + "'>");
+            markup.push(item.name.substring(match, match + tl));
+            markup.push("</span>");
+            markup.push(item.name.substring(match + tl, item.name.length));
+            return markup.join("")
+          }
+
+          formatItemSelection = function (item) {
+            return item.name;
+          }
+
           $(fakeInput).select2({
             minimumInputLength: 1,
             ajax: {
@@ -48,32 +70,12 @@ jQuery(document).ready(function($) {
       }
     });
   }
+
   memberstab = $('#tab-members').first();
   if ((memberstab != null) && (memberstab.hasClass("selected"))) {
     init_members_cb();
   } else {
     memberstab.click(init_members_cb);
-  }
-
-  formatItems = function (item, container, query) {
-    var match = item.name.toUpperCase().indexOf(query.term.toUpperCase()),
-    tl = query.term.length,
-    markup = [];
-
-    if (match < 0) {
-      return "<span data-value='" + item.id + "'>" + item.name + "</span>";
-    }
-
-    markup.push(item.name.substring(0, match));
-    markup.push("<span class='select2-match' data-value='" + item.id + "'>");
-    markup.push(item.name.substring(match, match + tl));
-    markup.push("</span>");
-    markup.push(item.name.substring(match + tl, item.name.length));
-    return markup.join("")
-  }
-
-  formatItemSelection = function (item) {
-    return item.name;
   }
 
 });

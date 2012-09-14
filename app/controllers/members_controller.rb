@@ -19,14 +19,16 @@ class MembersController < ApplicationController
   before_filter :find_project, :only => [:new, :autocomplete_for_member]
   before_filter :authorize
 
-  TAB_SCRIPTS = 'hideOnLoad(); init_members_cb();'
+  TAB_SCRIPTS = <<JS
+    hideOnLoad();
+    init_members_cb();
+JS
 
   def new
     if params[:member]
       members = new_members_from_params
       @project.members << members
     end
-
     respond_to do |format|
       if members.present? && members.all? {|m| m.valid? }
 
@@ -96,17 +98,33 @@ class MembersController < ApplicationController
   end
 
   def autocomplete_for_member
-    size = params[:page_limit].to_i
-    page = params[:page].to_i
+    size = params[:page_limit].to_i || 10
+    page = params[:page]
 
-    @principals = Principal.paginated_search(params[:q], page, { :page_limit => size })
-    # we always get all the items on a page, so just check if we just got the last
-    @more = @principals.total_pages > page
-    @total = @principals.total_entries
+    if page
+      page = page.to_i
+      @principals = Principal.paginate_scope!(Principal.search_scope_without_project(@project, params[:q]).scope(:find),
+                        { :page => page, :page_limit => size })
+      # we always get all the items on a page, so just check if we just got the last
+      @more = @principals.total_pages > page
+      @total = @principals.total_entries
+    else
+      @principals = Principal.possible_members(params[:q], 100) - @project.principals
+    end
 
     respond_to do |format|
       format.json { render :layout => false }
-      format.html { render :partial => 'members/autocomplete_for_member', :locals => { :principals => @principals, :roles => roles } }
+      format.html {
+        if request.xhr?
+          partial = "members/autocomplete_for_member"
+        else
+          partial = "members/members_form"
+        end
+        render :partial => partial,
+               :locals => { :project => @project,
+                            :principals => @principals,
+                            :roles => Role.find_all_givable }
+      }
     end
   end
 

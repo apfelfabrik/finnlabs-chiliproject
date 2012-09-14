@@ -1,30 +1,14 @@
 <%= javascript_include_tag "members_select_boxes.js" %>
 
-<% remote_form_for(:member, :url => {:controller => 'members', :action => 'new', :id => project}, :method => :post, :html => {:id => "members_add_form"}) do |f| %>
-  <fieldset>
-    <legend><%= l(:label_member_new) %></legend>
-      <div class="splitcontentleft">
-        <label>
-          <%= select_tag "member[user_ids][]", options_for_select([]),
-                         :title => l(:label_principal_search),
-                         :multiple => true,
-                         :'data-placeholder' => l(:label_principal_search),
-                         :'data-ajaxURL' => url_for(:controller => "members", :action => "autocomplete_for_member"),
-                         :'data-projectId' => project.id,
-                         :class => "select2-select" %>
-        </label>
-      </div>
-      <div class="splitcontentright">
-        <label>
-          <%= select_tag 'member[role_ids][]', options_for_select([]),
-                         :title => l(:label_role_plural),
-                         :multiple => true,
-                         :'data-placeholder' => l(:label_role_search),
-                         :'data-ajaxURL' => url_for(:controller => "roles", :action => "autocomplete_for_role"),
-                         :'data-projectId' => project.id,
-                         :class => "select2-select" %>
-        </label>
-      </div>
-    <p><%= submit_tag l(:button_add), :id => 'member-add-submit' %></p>
-  </fieldset>
+<% if User.current.impaired? %>
+  <% partial = "members/member_form_impaired" %>
+  <% locals = { :members => @project.member_principals.find(:all, :include => [:roles, :principal, :member_roles]) }%>
+<% else %>
+  <% partial = "members/member_form_non_impaired" %>
+  <% locals = {} %>
 <% end %>
+
+<%= render :partial => partial,
+           :locals => locals.merge!({ :project => project,
+                        :roles => roles,
+                        :principals => principals }) %>
