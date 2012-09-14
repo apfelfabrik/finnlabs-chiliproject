@@ -13,7 +13,7 @@ class CreateWikiMenuItemForExistingWikis < ActiveRecord::Migration
       menu_item.save!
     end
 
-    if Wiki.new.respond_to?(:show_default_tab)
+    unless Wiki.columns.select {|a| a.name.to_s == "show_default_tab"}.empty?
       change_table :wikis do |t|
         t.remove :show_default_tab
       end
