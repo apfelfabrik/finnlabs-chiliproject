@@ -19,7 +19,10 @@ class MembersController < ApplicationController
   before_filter :find_project, :only => [:new, :autocomplete_for_member]
   before_filter :authorize
 
-  TAB_SCRIPTS = 'hideOnLoad(); init_members_cb();'
+  TAB_SCRIPTS = <<JS
+    hideOnLoad();
+    init_members_cb();
+JS
 
   def new
     if params[:member]
@@ -99,7 +102,7 @@ class MembersController < ApplicationController
     roles = Role.find_all_givable
     available_principals = @project.possible_members(params[:q], 100)
 
-    render :partial => 'members/autocomplete_for_member', :locals => { :available_principals => available_principals, :roles => roles }
+    render :partial => 'members/autocomplete_for_member', :locals => { :principals => available_principals, :roles => roles }
   end
 
   private

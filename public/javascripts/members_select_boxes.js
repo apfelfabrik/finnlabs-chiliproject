@@ -9,6 +9,7 @@ jQuery(document).ready(function($) {
       }
     });
   }
+
   memberstab = $('#tab-members').first();
   if ((memberstab != null) && (memberstab.hasClass("selected"))) {
     init_members_cb();
