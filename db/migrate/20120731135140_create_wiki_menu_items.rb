@@ -5,7 +5,11 @@ class CreateWikiMenuItems < ActiveRecord::Migration
 
       add_column :wiki_menu_items, :parent_id, :integer
       add_column :wiki_menu_items, :options, :text
+
+      WikiMenuItem.all.each {|tab| tab.destroy unless tab.active}
       remove_column :wiki_menu_items, :active
+
+      WikiMenuItem.reset_column_information
     else
       create_table :wiki_menu_items do |t|
         t.column :name, :string
