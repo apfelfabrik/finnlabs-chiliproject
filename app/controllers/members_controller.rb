@@ -19,6 +19,11 @@ class MembersController < ApplicationController
   before_filter :find_project, :only => [:new, :autocomplete_for_member]
   before_filter :authorize
 
+  TAB_SCRIPTS = <<JS
+    hideOnLoad();
+    init_members_cb();
+JS
+
   def new
     if params[:member]
       members = new_members_from_params
@@ -35,7 +40,7 @@ class MembersController < ApplicationController
             page.replace_html "tab-content-members", :partial => 'projects/settings/members'
             page.insert_html :top, "tab-content-members", content_tag(:div, l(:notice_successful_create),
                                                                       :class => "flash notice")
-            page << 'hideOnLoad()'
+            page << TAB_SCRIPTS
           }
         }
       else
@@ -71,7 +76,7 @@ class MembersController < ApplicationController
             else
               page.replace_html "tab-content-members", :partial => 'projects/settings/members'
             end
-            page << 'hideOnLoad()'
+            page << TAB_SCRIPTS
             page.visual_effect(:highlight, "member-#{@member.id}") unless Member.find_by_id(@member.id).nil?
           }
         }
@@ -87,17 +92,26 @@ class MembersController < ApplicationController
       format.html { redirect_to :controller => 'projects', :action => 'settings', :tab => 'members', :id => @project }
       format.js { render(:update) {|page|
           page.replace_html "tab-content-members", :partial => 'projects/settings/members'
-          page << 'hideOnLoad()'
+          page << TAB_SCRIPTS
         }
       }
     end
   end
 
   def autocomplete_for_member
-    roles = Role.find_all_givable
-    available_principals = @project.possible_members(params[:q], 100)
+    size = params[:page_limit].to_i
+    page = params[:page].to_i
 
-    render :partial => 'members/autocomplete_for_member', :locals => { :available_principals => available_principals, :roles => roles }
+    @principals = Principal.paginated_search(params[:q], page, { :page_limit => size })
+    # we always get all the items on a page, so just check if we just got the last
+    @more = @principals.total_pages > page
+    @total = @principals.total_entries
+
+    respond_to do |format|
+      format.json { render :layout => false }
+      format.html { render :layout => false }
+    end
+
   end
 
   private

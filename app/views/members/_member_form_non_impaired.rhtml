@@ -1,0 +1,22 @@
+<% remote_form_for(:member, :url => {:controller => 'members', :action => 'new', :id => project}, :method => :post, :html => {:id => "members_add_form"}) do |f| %>
+  <fieldset>
+    <legend><%= l(:label_member_new) %></legend>
+    <p>
+      <label>
+        <%= select_tag "member[user_ids][]", options_for_select([]),
+                       :title => l(:label_principal_search),
+                       :'data-placeholder' => l(:label_principal_search),
+                       :class => "select2-select" %>
+      </label>
+    </p>
+    <p>
+      <label>
+        <%= select_tag 'member[role_ids][]', options_for_select([]),
+                       :title => l(:label_role_search),
+                       :'data-placeholder' => l(:label_role_search),
+                       :class => "select2-select" %>
+      </label>
+    </p>
+    <p><%= submit_tag l(:button_add), :id => 'member-add-submit' %></p>
+  </fieldset>
+<% end %>
