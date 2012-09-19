@@ -12,6 +12,7 @@ gem 'delayed_job', "~>2.0.4"
 
 gem "i18n-js"
 gem "will_paginate", "~> 2.3.16"
+gem "i18n-js"
 
 group :test do
   gem 'shoulda', '~> 2.10.3'

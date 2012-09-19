@@ -22,8 +22,6 @@
 <%= javascript_include_tag 'breadcrumb.js' %>
 <%= javascript_include_tag 'select2.js' %>
 <%= javascript_include_tag 'findDomElement.js' %>
-<%= stylesheet_link_tag 'select2'%>
-<%= stylesheet_link_tag 'select2_customizing'%>
 <%= javascript_include_tag "i18n" %>
 <%= javascript_include_tag "translations" %>
 <% javascript_tag do -%>
@@ -36,6 +34,8 @@
 <% end %>
 <%= javascript_tag('jQuery.noConflict();') %>
 <%= javascript_heads %>
+<%= stylesheet_link_tag 'select2'%>
+<%= stylesheet_link_tag 'select2_customizing'%>
 <%= stylesheet_link_tag 'jstoolbar' %>
 <%= heads_for_theme %>
 <% heads_for_wiki_formatter %>
