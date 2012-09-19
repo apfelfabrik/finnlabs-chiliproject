@@ -22,6 +22,9 @@ class Role < ActiveRecord::Base
     compare = 'not' if args.first == true
     { :conditions => "#{compare} builtin = 0" }
   }
+  named_scope :like, lambda { |q|
+    { :conditions => ["LOWER(name) LIKE :s", {:s => "%#{q.to_s.strip.downcase}%"}] }
+  }
 
   before_destroy :check_deletable
   has_many :workflows, :dependent => :delete_all do
@@ -140,6 +143,12 @@ class Role < ActiveRecord::Base
       raise 'Unable to create the anonymous role.' if anonymous_role.new_record?
     end
     anonymous_role
+  end
+
+  def self.paginated_search(search, page, options = {})
+    limit = options.fetch(:page_limit) || 10
+    registered_scope = givable.like(search).scope(:find)
+    paginate({ :per_page => limit, :page => page }.merge(registered_scope))
   end
 
   def self.by_permission(permission)
