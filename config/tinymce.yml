@@ -85,9 +85,9 @@ template_mdate_format: "%m/%d/%Y : %H:%M:%S"
 template_templates:
   -
     title: "Status Report"
-    src: "/assets/tiny_mce_assets/templates/status_report.html"
+    src: "/assets/tinymce/templates/status_report.html"
     description: "Adds a default project status report."
   -
     title: "Contact Information Page"
-    src: "/assets/tiny_mce_assets/templates/contact_page.html"
+    src: "/assets/tinymce/templates/contact_page.html"
     description: "Adds default contact information page."
