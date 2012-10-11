@@ -1,0 +1,48 @@
+body
+  min-width: initial
+
+#attachment_list
+  height: 200px
+  padding: 10px
+  border: 2px solid darkgrey
+  overflow-x: scroll
+  white-space: nowrap
+  background-color: lightgray
+  .attachment
+    height: 180px
+    padding: 0 1em
+    display: inline-block
+    text-align: center
+    font-weight: bold
+    img
+      height: 160px
+  #new_attachment
+    height: 174px
+    width: 17em
+    padding: 0 1em
+    border: 3px dashed black
+    display: inline-table
+    background-color: darkgrey
+    white-space: normal
+    vertical-align: top
+
+#new_attachment
+  #add_symbol
+    height: 1em
+    padding: 0
+  label
+    white-space: nowrap
+  .centered_content
+    display: table-cell
+    vertical-align: middle
+
+#attachment_list img:last-child
+  padding: 0 0 0 1em
+
+#attachments_fields
+  margin: 10px 0
+
+#attachment_description_container
+  margin: 10px auto
+  input[type=text]
+    width: 260px
