@@ -1,0 +1,5 @@
+/* Silver */
+.openprojectSkinSilver .mceToolbar .mceToolbarStart span, .openprojectSkinSilver .mceButton, .openprojectSkinSilver .mceSplitButton, .openprojectSkinSilver .mceSeparator, .openprojectSkinSilver .mceSplitButton a.mceOpen, .openprojectSkinSilver .mceListBox a.mceOpen {background-image:url(img/button_bg_silver.png)}
+.openprojectSkinSilver td.mceToolbar, .openprojectSkinSilver td.mceStatusbar, .openprojectSkinSilver .mceMenuItemTitle a {background:#eee}
+.openprojectSkinSilver .mceListBox .mceText {background:#FFF}
+.openprojectSkinSilver .mceExternalToolbar, .openprojectSkinSilver .mceListBox .mceText, .openprojectSkinSilver div.mceMenu, .openprojectSkinSilver table.mceLayout, .openprojectSkinSilver .mceMenuItemTitle a, .openprojectSkinSilver table.mceLayout tr.mceFirst td, .openprojectSkinSilver table.mceLayout, .openprojectSkinSilver .mceMenuItemTitle a, .openprojectSkinSilver table.mceLayout tr.mceLast td, .openprojectSkinSilver .mceIframeContainer {border-color: #bbb}

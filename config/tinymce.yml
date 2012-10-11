@@ -1,6 +1,6 @@
 mode: none
-theme: advanced # openproject
-skin: o2k7      # default
+theme: advanced
+skin: openproject
 skin_variant: silver
 theme_advanced_toolbar_location: top
 theme_advanced_toolbar_align: left
@@ -19,16 +19,7 @@ plugins:
   - noneditable
   - nonbreaking
   - xhtmlxtras
-disabled_plugins: #not used by tinyMCE, its just here for documentation
   - openproject
-  - advimage
-  - iespell
-  - spellchecker
-  - visualchars
-  - advhr
-  - searchreplace
-  - insertdatetime
-  - media
 theme_advanced_buttons1:
   - template
   - "|"
