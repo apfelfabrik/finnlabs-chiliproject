@@ -10,11 +10,10 @@ OpenImageDialog =
   initHandlers: ->
     jQuery('#attachment_list').on 'click', '.attachment', (event) ->
       newSelection = jQuery this
-      oldSelection = OpenImageDialog.getSelectedAttachment()
       # do not select the new_attachment div
       return if newSelection.is '#new_attachment'
       jQuery('#attachment_list .attachment').removeClass 'selected'
-      newSelection.addClass 'selected' unless newSelection is oldSelection
+      newSelection.addClass 'selected'
 
   getSelectedAttachment: ->
     jQuery('#attachment_list .attachment.selected')
