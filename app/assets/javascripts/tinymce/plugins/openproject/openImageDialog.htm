@@ -1,22 +1,52 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<title>{#openproject.imageDialogTitle}</title>
-	<script type="text/javascript" src="../../tiny_mce_popup.js"></script>
-	<script type="text/javascript" src="js/openImageDialog.js"></script>
-</head>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{#openproject.imageDialogTitle}</title>
+    <link rel="stylesheet" type="text/css" href="/assets/application.css">
+    <link rel="stylesheet" type="text/css" href="css/openImageDialog.css">
+  </head>
 <body>
+  <form action="#">
+    <div id="attachment_list">
+      <span id="new_attachment">
+        <span class="centered_content">
+          <label>
+            <h3>
+              <img src="/assets/add.png" id="add_symbol">
+              {#openproject.upload_new_attachment}
+            </h3>
+            <input class="attachment_choose_file" name="new_attachment" size="15" type="file" />
+          </label>
+          <br />
+          <input class="attachment_save_file" name="save_attachment" type="button" name="Upload Attachment" value="{#openproject.upload_attachment}" />
+        </span>
+      </span>
+      <!-- example image to populate the list -->
+      <span class="attachment">
+        <img src="http://www.easy-tools.net/images/example_web_editor.jpg" />
+        <p>filename.jpg</p>
+      </span>
+      <span class="attachment">
+        <img src="http://treesflowersbirds.files.wordpress.com/2009/02/garfield-coffee.jpg?w=312&h=318" />
+        <p>very long filename with whitespace.png</p>
+      </span>
+    </div>
 
-<form onsubmit="OpenImageDialog.insert();return false;" action="#">
-	<p>Here is a open image dialog.</p>
-	<p>Selected text: <input id="someval" name="someval" type="text" class="text" /></p>
-	<p>Custom arg: <input id="somearg" name="somearg" type="text" class="text" /></p>
+    <div id="attachment_description_container">
+      <label class="label-with-input">
+        {#openproject.description}
+        <input name="attachment_description" size="38" type="text" value="">
+      </label>
+    </div>
 
-	<div class="mceActionPanel">
-		<input type="button" id="insert" name="insert" value="{#insert}" onclick="OpenImageDialog.insert();" />
-		<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
-	</div>
-</form>
 
-</body>
+    <div class="mceActionPanel">
+      <input type="button" id="insert" name="insert" value="{#insert}"/>
+      <input type="button" id="cancel" name="cancel" value="{#cancel}"/>
+    </div>
+  </form>
+  </body>
+  <script type="text/javascript" src="/assets/jquery.js"></script>
+  <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+  <script type="text/javascript" src="js/openImageDialog.js"></script>
 </html>
