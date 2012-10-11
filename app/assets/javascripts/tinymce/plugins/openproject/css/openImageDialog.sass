@@ -1,5 +1,6 @@
 $list_height: 200px
 $list_item_seperator_space: 2em
+$list_background: lightgray
 
 body
   min-width: initial
@@ -11,7 +12,7 @@ body
   border: 2px solid darkgrey
   overflow-x: scroll
   white-space: nowrap
-  background-color: lightgray
+  background-color: $list_background
   .attachment
     height: $list_height - 20px
     padding: 0 $list_item_seperator_space/4
@@ -20,6 +21,7 @@ body
     text-align: center
     font-weight: bold
     cursor: pointer
+    border: 2px solid $list_background
     img
       height: $list_height - 40px
     img:last-child

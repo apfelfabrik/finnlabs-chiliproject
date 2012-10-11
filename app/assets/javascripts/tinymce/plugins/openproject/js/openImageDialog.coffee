@@ -2,15 +2,22 @@ tinyMCEPopup.requireLangPack()
 
 OpenImageDialog =
   init: ->
-    form = document.forms[0];
-    this.initHandlers form
+    this.initHandlers()
 
     # Get the selected contents as text and place it in the input
-    tinyMCEPopup.editor.selection.getContent {format : 'text'}
+    console.log tinyMCEPopup.editor.selection.getContent()
 
   initHandlers: ->
-    #debugger
-    console.log 'foo'
+    jQuery('#attachment_list').on 'click', '.attachment', (event) ->
+      newSelection = jQuery this
+      oldSelection = OpenImageDialog.getSelectedAttachment()
+      # do not select the new_attachment div
+      return if newSelection.is '#new_attachment'
+      jQuery('#attachment_list .attachment').removeClass 'selected'
+      newSelection.addClass 'selected' unless newSelection is oldSelection
+
+  getSelectedAttachment: ->
+    jQuery('#attachment_list .attachment.selected')
 
   insert: ->
     ed = tinyMCEPopup.editor

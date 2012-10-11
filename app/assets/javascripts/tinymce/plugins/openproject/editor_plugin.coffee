@@ -11,8 +11,7 @@ Released under GPL License.
     init: (ed, url) ->
       # Register commands
       ed.addCommand "showOPImageDialog", ->
-        # Internal image object like a flash placeholder
-        return  unless ed.dom.getAttrib(ed.selection.getNode(), "class", "").indexOf("mceItem") is -1
+        return unless ed.plugins.openproject.isEditable ed.selection.getNode(), ed
         ed.windowManager.open
           file: url + "/openImageDialog.htm"
           width: 580 + parseInt(ed.getLang("openproject.delta_width", 0))
@@ -28,7 +27,11 @@ Released under GPL License.
 
       # Add a node change handler, selects the button in the UI when a image is selected
       ed.onNodeChange.add (ed, cm, n) ->
-        cm.setActive "openproject", n.nodeName is "IMG"
+        cm.setActive "openproject", n.nodeName is "IMG" && ed.plugins.openproject.isEditable(n, ed)
+
+    isEditable: (node, ed) ->
+      # dont edit internal image objects (like a flash placeholder)
+      ed.dom.getAttrib(node, "class", "").indexOf("mceItem")  is -1
 
     getInfo: ->
       longname: "OpenProject plugin"
