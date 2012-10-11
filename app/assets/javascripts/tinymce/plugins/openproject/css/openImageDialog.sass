@@ -1,30 +1,49 @@
+$list_height: 200px
+$list_item_seperator_space: 2em
+
 body
   min-width: initial
 
 #attachment_list
-  height: 200px
-  padding: 10px
+  height: $list_height
+  padding: 10px 0
+  margin-bottom: 10px
   border: 2px solid darkgrey
   overflow-x: scroll
   white-space: nowrap
   background-color: lightgray
   .attachment
-    height: 180px
-    padding: 0 1em
+    height: $list_height - 20px
+    padding: 0 $list_item_seperator_space/4
+    margin: 0 $list_item_seperator_space/4
     display: inline-block
     text-align: center
     font-weight: bold
+    cursor: pointer
     img
-      height: 160px
+      height: $list_height - 40px
+    img:last-child
+      padding: 0 0 0 $list_item_seperator_space/4
+      margin: 0 0 0 $list_item_seperator_space/4
+  .attachment.selected
+    border: 2px dotted black
+    background-color: #AAA
   #new_attachment
-    height: 174px
+    height: $list_height - 26px
     width: 17em
     padding: 0 1em
+    margin: 0 $list_item_seperator_space/2
     border: 3px dashed black
     display: inline-table
-    background-color: darkgrey
+    background-color: #EEE
     white-space: normal
     vertical-align: top
+    input[type=file]
+      width: 100%
+      margin: 0
+      background-color: white
+  h3
+    margin-bottom: 1em
 
 #new_attachment
   #add_symbol
@@ -36,9 +55,6 @@ body
     display: table-cell
     vertical-align: middle
 
-#attachment_list img:last-child
-  padding: 0 0 0 1em
-
 #attachments_fields
   margin: 10px 0
 
@@ -46,3 +62,6 @@ body
   margin: 10px auto
   input[type=text]
     width: 260px
+
+#embed_or_link
+  margin-bottom: 20px

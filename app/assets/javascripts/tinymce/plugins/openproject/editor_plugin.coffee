@@ -15,8 +15,8 @@ Released under GPL License.
         return  unless ed.dom.getAttrib(ed.selection.getNode(), "class", "").indexOf("mceItem") is -1
         ed.windowManager.open
           file: url + "/openImageDialog.htm"
-          width: 480 + parseInt(ed.getLang("openproject.delta_width", 0))
-          height: 385 + parseInt(ed.getLang("openproject.delta_height", 0))
+          width: 580 + parseInt(ed.getLang("openproject.delta_width", 0))
+          height: 320 + parseInt(ed.getLang("openproject.delta_height", 0))
           inline: 1
         ,
           plugin_url: url
