@@ -9,12 +9,8 @@ OpenImageDialog =
     console.log tinyMCEPopup.editor.selection.getContent()
 
   initHandlers: ->
-    jQuery('#attachment_list').on 'click', '.attachment', (event) ->
-      newSelection = jQuery this
-      # do not select the new_attachment div
-      return if newSelection.is '#new_attachment'
-      jQuery('#attachment_list .attachment').removeClass 'selected'
-      newSelection.addClass 'selected'
+    jQuery('#attachment_list').on 'click', '.attachment', ->
+      OpenImageDialog.setSelectedAttachment jQuery(this)
 
   populateAttachmentList: ->
     jQuery.ajax tinyMCEPopup.editor.documentBaseURI.path + '/list_attachments.json',
@@ -51,6 +47,12 @@ OpenImageDialog =
 
   getSelectedAttachment: ->
     jQuery('#attachment_list .attachment.selected')
+
+  setSelectedAttachment: (newSelection)->
+    # do not select the new_attachment div
+    return if newSelection.is '#new_attachment'
+    jQuery('#attachment_list .attachment').removeClass 'selected'
+    newSelection.addClass 'selected'
 
   insert: ->
     ed = tinyMCEPopup.editor
