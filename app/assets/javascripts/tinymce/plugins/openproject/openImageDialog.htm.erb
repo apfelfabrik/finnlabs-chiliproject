@@ -5,48 +5,42 @@
     <link rel="stylesheet" type="text/css" href="/assets/application.css">
     <link rel="stylesheet" type="text/css" href="css/openImageDialog.css">
   </head>
-<body>
-  <div id="attachment_list">
-    <span id="new_attachment">
-      <form class="centered_content">
-        <label>
-          <h3>
-            <img src="/assets/add.png" id="add_symbol">
-            {#openproject_dlg.upload_new_attachment}
-          </h3>
-          <input class="attachment_choose_file" name="new_attachment" size="15" type="file" />
-        </label>
-        <br />
-        <div id="attachment_description_container">
-          <label class="label-with-input">
-            {#openproject_dlg.description}:<br />
-            <input name="attachment_description" size="38" type="text" value="">
+  <body>
+    <div id="attachment_list">
+      <span id="new_attachment">
+        <form class="centered_content">
+          <label>
+            <h3>
+              <img src="/assets/add.png" id="add_symbol">
+              {#openproject_dlg.upload_new_attachment}
+            </h3>
+            <input class="attachment_choose_file" name="new_attachment" size="15" type="file" />
           </label>
-        </div>
-        <input class="attachment_save_file" name="save_attachment" type="submit" name="Upload Attachment" value="{#openproject_dlg.upload_attachment}" />
-        <%= I18n.t(:label_max_size) %>: <%= ActionController::Base.helpers.number_to_human_size(Setting.attachment_max_size.to_i.kilobytes) %>
-      </form>
-    </span>
-    <!-- example image to populate the list -->
-    <span class="attachment selected">
-      <img src="http://www.easy-tools.net/images/example_web_editor.jpg" />
-      <p>filename.jpg</p>
-    </span>
-    <span class="attachment">
-      <img src="http://treesflowersbirds.files.wordpress.com/2009/02/garfield-coffee.jpg?w=312&h=318" />
-      <p>very long filename with whitespace.png</p>
-    </span>
-  </div>
-  <form action="#">
-    <div id="embed_or_link">
-      <label>Embed: <input type="radio" name="embed" value="1" disabled="disabled" checked="checked" /></label>
-      <label>Insert Link:  <input type="radio" name="embed" value="0" disabled="disabled" /></label>
+          <br />
+          <div id="attachment_description_container">
+            <label class="label-with-input">
+              {#openproject_dlg.description}:<br />
+              <input name="attachment_description" size="38" type="text" value="">
+            </label>
+          </div>
+          <input class="attachment_save_file" name="save_attachment" type="submit" name="Upload Attachment" value="{#openproject_dlg.upload_attachment}" />
+          <%= I18n.t(:label_max_size) %>: <%= ActionController::Base.helpers.number_to_human_size(Setting.attachment_max_size.to_i.kilobytes) %>
+        </form>
+      </span>
     </div>
-    <div class="mceActionPanel">
-      <input type="button" id="insert" name="insert" value="{#insert}"/>
-      <input type="button" id="cancel" name="cancel" value="{#cancel}"/>
+    <div id="attachment_list_loading">
+      <%= I18n.t(:label_loading) %>
     </div>
-  </form>
+    <form action="#">
+      <div id="embed_or_link">
+        <label>Embed: <input type="radio" name="embed" value="1" disabled="disabled" checked="checked" /></label>
+        <label>Insert Link:  <input type="radio" name="embed" value="0" disabled="disabled" /></label>
+      </div>
+      <div class="mceActionPanel">
+        <input type="button" id="insert" name="insert" value="{#insert}"/>
+        <input type="button" id="cancel" name="cancel" value="{#cancel}"/>
+      </div>
+    </form>
   </body>
   <script type="text/javascript" src="/assets/jquery.js"></script>
   <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
