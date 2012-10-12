@@ -30,16 +30,18 @@ OpenImageDialog =
     container.append jQuery '<p />',
       text: if a.description.length > 0 then a.description else a.filename
     filetype = a.filename.split('.').pop().toLowerCase()
-    preview = switch filetype
-      when 'jpg', 'jpeg', 'png', 'gif' # image
-        jQuery '<img />',
-          src: a.url
-          alt: a.description
-      else
-        jQuery '<img />',
-          src: '/assets/mimetypes/unknown.png'
-          alt: a.description
-    container.prepend preview
+    src = switch filetype
+      when 'jpg', 'jpeg', 'png', 'gif' then a.url
+      when 'pdf' then'/assets/mimetypes/pdf.png'
+      when 'txt' then '/assets/mimetypes/txt.png'
+      when 'xls', 'xlsx', 'ods' then '/assets/mimetypes/spreadsheet.png'
+      when 'doc', 'docx', 'odt' then '/assets/mimetypes/document.png'
+      when 'doc', 'docx', 'odt' then '/assets/mimetypes/document.png'
+      when 'ppt', 'pptx', 'odp' then '/assets/mimetypes/kpresenter_kpr.png'
+      else '/assets/mimetypes/unknown.png'
+    container.prepend(jQuery '<img />',
+          src: src
+          alt: a.description)
     jQuery('#attachment_list').append container
 
   loading: (flag, animationTime)->
