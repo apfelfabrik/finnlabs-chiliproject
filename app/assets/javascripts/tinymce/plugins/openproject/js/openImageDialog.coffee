@@ -11,6 +11,7 @@ OpenImageDialog =
   initHandlers: ->
     jQuery('#attachment_list').on 'click', '.attachment', ->
       OpenImageDialog.setSelectedAttachment jQuery(this)
+    jQuery('#cancel').on 'click', -> OpenImageDialog.close()
 
   populateAttachmentList: ->
     jQuery.ajax tinyMCEPopup.editor.documentBaseURI.path + '/list_attachments.json',
