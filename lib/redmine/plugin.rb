@@ -86,10 +86,13 @@ module Redmine #:nodoc:
       p.instance_eval(&block)
       # Set a default name if it was not provided during registration
       p.name(id.to_s.humanize) if p.name.nil?
-      # Adds plugin locales if any
-      # YAML translation files should be found under <plugin>/config/locales/
-      ::I18n.load_path += Dir.glob(Rails.root.join('vendor/plugins', id.to_s, 'config/locales/*.yml'))
+
       registered_plugins[id] = p
+
+      if p.settings
+        Setting.create_setting("plugin_#{id}", {'default' => p.settings[:default], 'serialized' => true})
+        Setting.create_setting_accessors("plugin_#{id}")
+      end
 
       # If there are plugins waiting for us to be loaded, we try loading those, again
       if deferred_plugins[id]
