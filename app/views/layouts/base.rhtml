@@ -20,13 +20,22 @@
 <%= javascript_include_tag 'jquery-ui.min.js' %>
 <%= javascript_include_tag 'jquery.menu_expand.js' %>
 <%= javascript_include_tag 'breadcrumb.js' %>
-<%= javascript_include_tag 'chosen.js'%>
-<%= stylesheet_link_tag 'chosen'%>
+<%= javascript_include_tag 'select2.js' %>
+<%= javascript_include_tag 'findDomElement.js' %>
+<%= javascript_include_tag "i18n" %>
+<%= javascript_include_tag "translations" %>
+<% javascript_tag do -%>
+  I18n.defaultLocale = "<%= I18n.default_locale %>";
+  I18n.locale = "<%= I18n.locale %>";
+<% end %>
+
 <% if User.current.impaired? && accessibility_css_enabled? %>
   <%= stylesheet_link_tag 'accessibility' %>
 <% end %>
 <%= javascript_tag('jQuery.noConflict();') %>
 <%= javascript_heads %>
+<%= stylesheet_link_tag 'select2'%>
+<%= stylesheet_link_tag 'select2_customizing'%>
 <%= stylesheet_link_tag 'jstoolbar' %>
 <%= heads_for_theme %>
 <% heads_for_wiki_formatter %>
