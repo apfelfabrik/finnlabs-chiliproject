@@ -1,6 +1,7 @@
 tinyMCEPopup.requireLangPack()
 
 OpenImageDialog =
+  attachableFileTypes: ['jpg', 'jpeg', 'gif', 'png']
   init: ->
     this.initHandlers()
     this.populateAttachmentList()
@@ -39,12 +40,17 @@ OpenImageDialog =
     container.prepend(jQuery '<img />',
           src: src
           alt: a.description)
+    container.data 'info', a
     jQuery('#attachment_list').append container
 
   loading: (flag, animationTime)->
     e = jQuery('#attachment_list_loading')
     e.fadeTo (animationTime || 200), (if flag then 1 else 0), ->
       if flag then e.show() else e.hide()
+
+  attachmentIsEmbedable: (filename) ->
+    filetype = a.filename.split('.').pop().toLowerCase()
+    _.contains OpenImageDialog.attachableFileTypes, filetype
 
   getSelectedAttachment: ->
     jQuery('#attachment_list .attachment.selected')
@@ -54,6 +60,11 @@ OpenImageDialog =
     return if newSelection.is '#new_attachment'
     jQuery('#attachment_list .attachment').removeClass 'selected'
     newSelection.addClass 'selected'
+    if OpenImageDialog.attachmentIsEmbedable(newSelection.data('info').filename)
+      OpenImageDialog.activateEmbedSelection()
+
+  activateEmbedOrLink: (embed, link) ->
+    #foo
 
   insert: ->
     ed = tinyMCEPopup.editor
