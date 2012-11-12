@@ -65,7 +65,7 @@ class Member < ActiveRecord::Base
   end
 
   def before_destroy
-    if user
+    if user and project
       # remove category based auto assignments for this member
       IssueCategory.update_all "assigned_to_id = NULL", ["project_id = ? AND assigned_to_id = ?", project.id, user.id]
     end

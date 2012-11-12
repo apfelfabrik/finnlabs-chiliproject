@@ -57,25 +57,30 @@ class MembersController < ApplicationController
   end
 
   def edit
-    if request.post? and
-      member = update_member_from_params and
-      member.save
+    return unless request.post?
 
-  	 respond_to do |format|
-        format.html { redirect_to :controller => 'projects', :action => 'settings', :tab => 'members', :id => @project, :page => params[:page] }
-        format.js {
-          render(:update) { |page|
-            if params[:membership]
-              @user = member.user
-              page.replace_html "tab-content-memberships", :partial => 'users/memberships'
-            else
-              page.replace_html "tab-content-members", :partial => 'projects/settings/members'
-            end
-            page << 'hideOnLoad()'
-            page.visual_effect(:highlight, "member-#{@member.id}") unless Member.find_by_id(@member.id).nil?
-          }
+    update_member_from_params
+
+    if @member.member_roles.all?(&:marked_for_destruction?)
+      @member.destroy
+    else
+      @member.save!
+    end
+
+    respond_to do |format|
+      format.html { redirect_to :controller => 'projects', :action => 'settings', :tab => 'members', :id => @project, :page => params[:page] }
+      format.js {
+        render(:update) { |page|
+          if params[:membership]
+            @user = @member.user
+            page.replace_html "tab-content-memberships", :partial => 'users/memberships'
+          else
+            page.replace_html "tab-content-members", :partial => 'projects/settings/members'
+          end
+          page << 'hideOnLoad()'
+          page.visual_effect(:highlight, "member-#{@member.id}") unless Member.find_by_id(@member.id).nil?
         }
-      end
+      }
     end
   end
 

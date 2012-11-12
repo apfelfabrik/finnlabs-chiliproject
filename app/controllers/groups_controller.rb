@@ -133,22 +133,36 @@ class GroupsController < ApplicationController
   end
 
   def edit_membership
+    return unless request.post?
     @group = Group.find(params[:id])
-    @membership = Member.edit_membership(params[:membership_id], params[:membership], @group)
-    @membership.save if request.post?
+
+    @member = Member.edit_membership(params[:membership_id], params[:membership], @group)
+
+    success = nil
+    highlight = nil
+
+    if params[:membership].present?
+      highlight = true
+      success = @member.save
+    else
+      hightlight = false
+      success = true
+      @member.destroy
+    end
+
     respond_to do |format|
-      if @membership.valid?
+      if @member.valid?
         format.html { redirect_to :controller => 'groups', :action => 'edit', :id => @group, :tab => 'memberships' }
         format.js {
           render(:update) {|page|
             page.replace_html "tab-content-memberships", :partial => 'groups/memberships'
-            page.visual_effect(:highlight, "member-#{@membership.id}")
+            page.visual_effect(:highlight, "member-#{@member.id}") if highlight
           }
         }
       else
         format.js {
           render(:update) {|page|
-            page.alert(l(:notice_failed_to_save_members, :errors => @membership.errors.full_messages.join(', ')))
+            page.alert(l(:notice_failed_to_save_members, :errors => @member.errors.full_messages.join(', ')))
           }
         }
       end
