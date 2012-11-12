@@ -29,6 +29,7 @@ class ActivitiesControllerTest < ActionController::TestCase
                  :child => { :tag => "dt",
                    :attributes => { :class => /issue/ },
                    :child => { :tag => "a",
+                     :content => /#{escaped IssueStatus.find(2).name}/,
                      :content => /(#{IssueStatus.find(2).name})/,
                    }
                  }
@@ -47,7 +48,7 @@ class ActivitiesControllerTest < ActionController::TestCase
                  :child => { :tag => "dt",
                    :attributes => { :class => /issue/ },
                    :child => { :tag => "a",
-                     :content => /#{Issue.find(1).subject}/,
+                     :content => /#{escaped Issue.find(1).subject}/,
                    }
                  }
                }
@@ -65,7 +66,7 @@ class ActivitiesControllerTest < ActionController::TestCase
                  :child => { :tag => "dt",
                    :attributes => { :class => /issue/ },
                    :child => { :tag => "a",
-                     :content => /#{Issue.find(1).subject}/,
+                     :content => /#{escaped Issue.find(1).subject}/,
                    }
                  }
                }
@@ -83,7 +84,7 @@ class ActivitiesControllerTest < ActionController::TestCase
                  :child => { :tag => "dt",
                    :attributes => { :class => /issue/ },
                    :child => { :tag => "a",
-                     :content => /#{Issue.find(1).subject}/,
+                     :content => /#{escaped Issue.find(1).subject}/,
                    }
                  }
                }
@@ -98,4 +99,9 @@ class ActivitiesControllerTest < ActionController::TestCase
       :attributes => {:href => 'http://test.host/issues/11'}}
   end
 
+  include ActionView::Helpers::TagHelper
+
+  def escaped(text)
+    Regexp.escape(escape_once text)
+  end
 end

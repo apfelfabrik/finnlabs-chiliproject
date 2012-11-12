@@ -57,13 +57,13 @@ class IssuesControllerTest < ActionController::TestCase
     assert_template 'index.rhtml'
     assert_not_nil assigns(:issues)
     assert_nil assigns(:project)
-    assert_tag :tag => 'a', :content => /Can't print recipes/
-    assert_tag :tag => 'a', :content => /Subproject issue/
+    assert_tag    :tag => 'a',  :content => /#{escaped "Can't print recipes"}/
+    assert_tag    :tag => 'a',  :content => /#{escaped "Subproject issue"}/
     # private projects hidden
-    assert_no_tag :tag => 'a', :content => /Issue of a private subproject/
-    assert_no_tag :tag => 'a', :content => /Issue on project 2/
+    assert_no_tag :tag => 'a',  :content => /#{escaped "Issue of a private subproject"}/
+    assert_no_tag :tag => 'a',  :content => /#{escaped "Issue on project 2"}/
     # project column
-    assert_tag :tag => 'th', :content => /Project/
+    assert_tag    :tag => 'th', :content => /#{escaped "Project"}/
   end
 
   def test_index_should_not_list_issues_when_module_disabled
@@ -73,8 +73,8 @@ class IssuesControllerTest < ActionController::TestCase
     assert_template 'index.rhtml'
     assert_not_nil assigns(:issues)
     assert_nil assigns(:project)
-    assert_no_tag :tag => 'a', :content => /Can't print recipes/
-    assert_tag :tag => 'a', :content => /Subproject issue/
+    assert_no_tag :tag => 'a', :content => /#{escaped "Can't print recipes"}/
+    assert_tag    :tag => 'a', :content => /#{escaped "Subproject issue"}/
   end
 
   def test_index_should_not_list_issues_when_module_disabled
@@ -84,8 +84,8 @@ class IssuesControllerTest < ActionController::TestCase
     assert_template 'index.rhtml'
     assert_not_nil assigns(:issues)
     assert_nil assigns(:project)
-    assert_no_tag :tag => 'a', :content => /Can't print recipes/
-    assert_tag :tag => 'a', :content => /Subproject issue/
+    assert_no_tag :tag => 'a', :content => /#{escaped "Can't print recipes"}/
+    assert_tag    :tag => 'a', :content => /#{escaped "Subproject issue"}/
   end
 
   def test_index_with_project
@@ -94,8 +94,8 @@ class IssuesControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'index.rhtml'
     assert_not_nil assigns(:issues)
-    assert_tag :tag => 'a', :content => /Can't print recipes/
-    assert_no_tag :tag => 'a', :content => /Subproject issue/
+    assert_tag    :tag => 'a', :content => /#{escaped "Can't print recipes"}/
+    assert_no_tag :tag => 'a', :content => /#{escaped "Subproject issue"}/
   end
 
   def test_index_with_project_and_subprojects
@@ -104,9 +104,9 @@ class IssuesControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'index.rhtml'
     assert_not_nil assigns(:issues)
-    assert_tag :tag => 'a', :content => /Can't print recipes/
-    assert_tag :tag => 'a', :content => /Subproject issue/
-    assert_no_tag :tag => 'a', :content => /Issue of a private subproject/
+    assert_tag :tag => 'a',    :content => /#{escaped "Can't print recipes"}/
+    assert_tag :tag => 'a',    :content => /#{escaped "Subproject issue"}/
+    assert_no_tag :tag => 'a', :content => /#{escaped "Issue of a private subproject"}/
   end
 
   def test_index_with_project_and_subprojects_should_show_private_subprojects
@@ -116,9 +116,9 @@ class IssuesControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'index.rhtml'
     assert_not_nil assigns(:issues)
-    assert_tag :tag => 'a', :content => /Can't print recipes/
-    assert_tag :tag => 'a', :content => /Subproject issue/
-    assert_tag :tag => 'a', :content => /Issue of a private subproject/
+    assert_tag :tag => 'a', :content => /#{escaped "Can't print recipes"}/
+    assert_tag :tag => 'a', :content => /#{escaped "Subproject issue"}/
+    assert_tag :tag => 'a', :content => /#{escaped "Issue of a private subproject"}/
   end
 
   def test_index_with_project_and_default_filter
@@ -274,7 +274,7 @@ class IssuesControllerTest < ActionController::TestCase
     assert_tag :tag => 'form',
                :descendant => { :tag => 'fieldset',
                                 :child => { :tag => 'legend',
-                                            :content => /Notes/ } }
+                                            :content => /#{escaped "Notes"}/ } }
   end
 
   def test_show_by_manager
@@ -283,18 +283,18 @@ class IssuesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_tag :tag => 'a',
-      :content => /Quote/
+      :content => /#{escaped "Quote"}/
 
     assert_tag :tag => 'form',
                :descendant => { :tag => 'fieldset',
                                 :child => { :tag => 'legend',
-                                            :content => /Change properties/ } },
+                                            :content => /#{escaped "Change properties"}/ } },
                :descendant => { :tag => 'fieldset',
                                 :child => { :tag => 'legend',
-                                            :content => /Log time/ } },
+                                            :content => /#{escaped "Log time"}/ } },
                :descendant => { :tag => 'fieldset',
                                 :child => { :tag => 'legend',
-                                            :content => /Notes/ } }
+                                            :content => /#{escaped "Notes"}/ } }
   end
 
   def test_show_should_deny_anonymous_access_without_permission
@@ -327,9 +327,9 @@ class IssuesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_tag :div, :attributes => { :id => 'relations' },
-                     :descendant => { :tag => 'a', :content => /#2$/ }
+                     :descendant => { :tag => 'a', :content => /#{escaped "#2"}$/ }
     assert_no_tag :div, :attributes => { :id => 'relations' },
-                        :descendant => { :tag => 'a', :content => /#4$/ }
+                        :descendant => { :tag => 'a', :content => /#{escaped "#4"}$/ }
   end
 
   def test_show_atom
@@ -374,7 +374,7 @@ class IssuesControllerTest < ActionController::TestCase
 
     get :new, :project_id => 1
     assert_response 500
-    assert_error_tag :content => /No default issue/
+    assert_error_tag :content => /#{escaped "No default issue"}/
   end
 
   def test_get_new_with_no_tracker_should_display_an_error
@@ -383,7 +383,7 @@ class IssuesControllerTest < ActionController::TestCase
 
     get :new, :project_id => 1
     assert_response 500
-    assert_error_tag :content => /No tracker/
+    assert_error_tag :content => /#{escaped "No tracker"}/
   end
 
   def test_update_new_form
@@ -1037,7 +1037,7 @@ class IssuesControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'edit'
 
-    assert_error_tag :descendant => {:content => /Activity can't be blank/}
+    assert_error_tag :descendant => {:content => /#{escaped "Activity can't be blank"}/}
     assert_tag :textarea, :attributes => { :name => 'notes' }, :content => notes
     assert_tag :input, :attributes => { :name => 'time_entry[hours]', :value => "2z" }
   end
@@ -1055,8 +1055,8 @@ class IssuesControllerTest < ActionController::TestCase
     assert_response :success
     assert_template 'edit'
 
-    assert_error_tag :descendant => {:content => /Activity can't be blank/}
-    assert_error_tag :descendant => {:content => /Hours can't be blank/}
+    assert_error_tag :descendant => {:content => /#{escaped "Activity can't be blank"}/}
+    assert_error_tag :descendant => {:content => /#{escaped "Hours can't be blank"}/}
     assert_tag :textarea, :attributes => { :name => 'notes' }, :content => notes
     assert_tag :input, :attributes => { :name => 'time_entry[comments]', :value => "this is my comment" }
   end
@@ -1390,4 +1390,9 @@ class IssuesControllerTest < ActionController::TestCase
     assert_select_rjs :show, "update"
   end
 
+  include ActionView::Helpers::TagHelper
+
+  def escaped(text)
+    Regexp.escape(escape_once text)
+  end
 end
