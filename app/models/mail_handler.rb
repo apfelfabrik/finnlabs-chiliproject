@@ -29,9 +29,9 @@ class MailHandler < ActionMailer::Base
     @@handler_options[:allow_override] = @@handler_options[:allow_override].split(',').collect(&:strip) if @@handler_options[:allow_override].is_a?(String)
     @@handler_options[:allow_override] ||= []
     # Project needs to be overridable if not specified
-    @@handler_options[:allow_override] << 'project' unless @@handler_options[:issue].has_key?(:project)
+    @@handler_options[:allow_override] << 'project' unless @@handler_options[:issue].has_key?('project')
     # Status overridable by default
-    @@handler_options[:allow_override] << 'status' unless @@handler_options[:issue].has_key?(:status)
+    @@handler_options[:allow_override] << 'status' unless @@handler_options[:issue].has_key?('status')
 
     @@handler_options[:no_permission_check] = (@@handler_options[:no_permission_check].to_s == '1' ? true : false)
     super email
@@ -221,14 +221,12 @@ class MailHandler < ActionMailer::Base
   end
 
   def get_keyword(attr, options={})
-    attr = attr.to_s
-
     @keywords ||= {}
     if @keywords.has_key?(attr)
       @keywords[attr]
     else
       @keywords[attr] = begin
-        if (options[:override] || @@handler_options[:allow_override].include?(attr.to_s)) && (v = extract_keyword!(plain_text_body, attr, options[:format]))
+        if (options[:override] || @@handler_options[:allow_override].include?(attr)) && (v = extract_keyword!(plain_text_body, attr, options[:format]))
           v
         elsif !@@handler_options[:issue][attr].blank?
           @@handler_options[:issue][attr]
@@ -240,11 +238,10 @@ class MailHandler < ActionMailer::Base
   # Destructively extracts the value for +attr+ in +text+
   # Returns nil if no matching keyword found
   def extract_keyword!(text, attr, format=nil)
-    keys = [attr.to_s.humanize]
-    if attr.is_a?(Symbol)
-      keys << l("field_#{attr}", :default => '', :locale =>  user.language) if user && user.language.present?
-      keys << l("field_#{attr}", :default => '', :locale =>  Setting.default_language) if Setting.default_language.present?
-    end
+    keys = [attr.humanize]
+    keys << l("field_#{attr}", :default => '', :locale =>  user.language) if user && user.language.present?
+    keys << l("field_#{attr}", :default => '', :locale =>  Setting.default_language) if Setting.default_language.present?
+
     keys.reject! {|k| k.blank?}
     keys.collect! {|k| Regexp.escape(k)}
     format ||= '.+'
@@ -256,27 +253,27 @@ class MailHandler < ActionMailer::Base
     # TODO: other ways to specify project:
     # * parse the email To field
     # * specific project (eg. Setting.mail_handler_target_project)
-    target = Project.find_by_identifier(get_keyword(:project))
+    target = Project.find_by_identifier(get_keyword('project'))
     raise MissingInformation.new('Unable to determine target project') if target.nil?
     target
   end
 
   # Returns a Hash of issue attributes extracted from keywords in the email body
   def issue_attributes_from_keywords(issue)
-    assigned_to = (k = get_keyword(:assigned_to, :override => true)) && find_user_from_keyword(k)
+    assigned_to = (k = get_keyword('assigned_to', :override => true)) && find_user_from_keyword(k)
     assigned_to = nil if assigned_to && !issue.assignable_users.include?(assigned_to)
 
     attrs = {
-      'tracker_id' => (k = get_keyword(:tracker)) && issue.project.trackers.find_by_name(k).try(:id),
-      'status_id' =>  (k = get_keyword(:status)) && IssueStatus.find_by_name(k).try(:id),
-      'priority_id' => (k = get_keyword(:priority)) && IssuePriority.find_by_name(k).try(:id),
-      'category_id' => (k = get_keyword(:category)) && issue.project.issue_categories.find_by_name(k).try(:id),
+      'tracker_id' => (k = get_keyword('tracker')) && issue.project.trackers.find_by_name(k).try(:id),
+      'status_id' =>  (k = get_keyword('status')) && IssueStatus.find_by_name(k).try(:id),
+      'priority_id' => (k = get_keyword('priority')) && IssuePriority.find_by_name(k).try(:id),
+      'category_id' => (k = get_keyword('category')) && issue.project.issue_categories.find_by_name(k).try(:id),
       'assigned_to_id' => assigned_to.try(:id),
-      'fixed_version_id' => (k = get_keyword(:fixed_version, :override => true)) && issue.project.shared_versions.find_by_name(k).try(:id),
-      'start_date' => get_keyword(:start_date, :override => true, :format => '\d{4}-\d{2}-\d{2}'),
-      'due_date' => get_keyword(:due_date, :override => true, :format => '\d{4}-\d{2}-\d{2}'),
-      'estimated_hours' => get_keyword(:estimated_hours, :override => true),
-      'done_ratio' => get_keyword(:done_ratio, :override => true, :format => '(\d|10)?0')
+      'fixed_version_id' => (k = get_keyword('fixed_version', :override => true)) && issue.project.shared_versions.find_by_name(k).try(:id),
+      'start_date' => get_keyword('start_date', :override => true, :format => '\d{4}-\d{2}-\d{2}'),
+      'due_date' => get_keyword('due_date', :override => true, :format => '\d{4}-\d{2}-\d{2}'),
+      'estimated_hours' => get_keyword('estimated_hours', :override => true),
+      'done_ratio' => get_keyword('done_ratio', :override => true, :format => '(\d|10)?0')
     }.delete_if {|k, v| v.blank? }
 
     if issue.new_record? && attrs['tracker_id'].nil?

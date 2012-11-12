@@ -77,7 +77,7 @@ class MailHandlerTest < ActiveSupport::TestCase
 
   def test_add_issue_with_default_tracker
     # This email contains: 'Project: onlinestore'
-    issue = submit_email('ticket_on_given_project.eml', :issue => {:tracker => 'Support request'})
+    issue = submit_email('ticket_on_given_project.eml', :issue => {'tracker' => 'Support request'})
     assert issue.is_a?(Issue)
     assert !issue.new_record?
     issue.reload
@@ -109,7 +109,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   end
 
   def test_add_issue_with_partial_attributes_override
-    issue = submit_email('ticket_with_attributes.eml', :issue => {:priority => 'High'}, :allow_override => ['tracker'])
+    issue = submit_email('ticket_with_attributes.eml', :issue => {'priority' => 'High'}, :allow_override => ['tracker'])
     assert issue.is_a?(Issue)
     assert !issue.new_record?
     issue.reload
@@ -138,7 +138,7 @@ class MailHandlerTest < ActiveSupport::TestCase
 
 
   def test_add_issue_with_attachment_to_specific_project
-    issue = submit_email('ticket_with_attachment.eml', :issue => {:project => 'onlinestore'})
+    issue = submit_email('ticket_with_attachment.eml', :issue => {'project' => 'onlinestore'})
     assert issue.is_a?(Issue)
     assert !issue.new_record?
     issue.reload
@@ -154,7 +154,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   end
 
   def test_add_issue_with_custom_fields
-    issue = submit_email('ticket_with_custom_fields.eml', :issue => {:project => 'onlinestore'})
+    issue = submit_email('ticket_with_custom_fields.eml', :issue => {'project' => 'onlinestore'})
     assert issue.is_a?(Issue)
     assert !issue.new_record?
     issue.reload
@@ -164,7 +164,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   end
 
   def test_add_issue_with_cc
-    issue = submit_email('ticket_with_cc.eml', :issue => {:project => 'ecookbook'})
+    issue = submit_email('ticket_with_cc.eml', :issue => {'project' => 'ecookbook'})
     assert issue.is_a?(Issue)
     assert !issue.new_record?
     issue.reload
@@ -174,14 +174,14 @@ class MailHandlerTest < ActiveSupport::TestCase
 
   def test_add_issue_by_unknown_user
     assert_no_difference 'User.count' do
-      assert_equal false, submit_email('ticket_by_unknown_user.eml', :issue => {:project => 'ecookbook'})
+      assert_equal false, submit_email('ticket_by_unknown_user.eml', :issue => {'project' => 'ecookbook'})
     end
   end
 
   def test_add_issue_by_anonymous_user
     Role.anonymous.add_permission!(:add_issues)
     assert_no_difference 'User.count' do
-      issue = submit_email('ticket_by_unknown_user.eml', :issue => {:project => 'ecookbook'}, :unknown_user => 'accept')
+      issue = submit_email('ticket_by_unknown_user.eml', :issue => {'project' => 'ecookbook'}, :unknown_user => 'accept')
       assert issue.is_a?(Issue)
       assert issue.author.anonymous?
     end
@@ -190,7 +190,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   def test_add_issue_by_anonymous_user_with_no_from_address
     Role.anonymous.add_permission!(:add_issues)
     assert_no_difference 'User.count' do
-      issue = submit_email('ticket_by_empty_user.eml', :issue => {:project => 'ecookbook'}, :unknown_user => 'accept')
+      issue = submit_email('ticket_by_empty_user.eml', :issue => {'project' => 'ecookbook'}, :unknown_user => 'accept')
       assert issue.is_a?(Issue)
       assert issue.author.anonymous?
     end
@@ -200,7 +200,7 @@ class MailHandlerTest < ActiveSupport::TestCase
     Role.anonymous.add_permission!(:add_issues)
     assert_no_difference 'User.count' do
       assert_no_difference 'Issue.count' do
-        assert_equal false, submit_email('ticket_by_unknown_user.eml', :issue => {:project => 'onlinestore'}, :unknown_user => 'accept')
+        assert_equal false, submit_email('ticket_by_unknown_user.eml', :issue => {'project' => 'onlinestore'}, :unknown_user => 'accept')
       end
     end
   end
@@ -208,7 +208,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   def test_add_issue_by_anonymous_user_on_private_project_without_permission_check
     assert_no_difference 'User.count' do
       assert_difference 'Issue.count' do
-        issue = submit_email('ticket_by_unknown_user.eml', :issue => {:project => 'onlinestore'}, :no_permission_check => '1', :unknown_user => 'accept')
+        issue = submit_email('ticket_by_unknown_user.eml', :issue => {'project' => 'onlinestore'}, :no_permission_check => '1', :unknown_user => 'accept')
         assert issue.is_a?(Issue)
         assert issue.author.anonymous?
         assert !issue.project.is_public?
@@ -221,7 +221,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   def test_add_issue_by_created_user
     Setting.default_language = 'en'
     assert_difference 'User.count' do
-      issue = submit_email('ticket_by_unknown_user.eml', :issue => {:project => 'ecookbook'}, :unknown_user => 'create')
+      issue = submit_email('ticket_by_unknown_user.eml', :issue => {'project' => 'ecookbook'}, :unknown_user => 'create')
       assert issue.is_a?(Issue)
       assert issue.author.active?
       assert_equal 'john.doe@somenet.foo', issue.author.mail
@@ -274,7 +274,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   def test_add_issue_with_japanese_keywords
     tracker = Tracker.create!(:name => '開発')
     Project.find(1).trackers << tracker
-    issue = submit_email('japanese_keywords_iso_2022_jp.eml', :issue => {:project => 'ecookbook'}, :allow_override => 'tracker')
+    issue = submit_email('japanese_keywords_iso_2022_jp.eml', :issue => {'project' => 'ecookbook'}, :allow_override => 'tracker')
     assert_kind_of Issue, issue
     assert_equal tracker, issue.tracker
   end
@@ -282,7 +282,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   def test_should_ignore_emails_from_emission_address
     Role.anonymous.add_permission!(:add_issues)
     assert_no_difference 'User.count' do
-      assert !submit_email('ticket_from_emission_address.eml', :issue => { :project => 'ecookbook'}, :unknown_user => 'create')
+      assert !submit_email('ticket_from_emission_address.eml', :issue => {'project' => 'ecookbook'}, :unknown_user => 'create')
     end
   end
 
@@ -340,7 +340,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   end
 
   def test_add_issue_note_should_not_set_defaults
-    journal = submit_email('ticket_reply.eml', :issue => {:tracker => 'Support request', :priority => 'High'})
+    journal = submit_email('ticket_reply.eml', :issue => {'tracker' => 'Support request', 'priority' => 'High'})
     assert journal.is_a?(Journal)
     assert_match /This is reply/, journal.notes
     assert_equal 'Feature request', journal.issue.tracker.name
@@ -367,7 +367,7 @@ class MailHandlerTest < ActiveSupport::TestCase
   end
 
   def test_should_strip_tags_of_html_only_emails
-    issue = submit_email('ticket_html_only.eml', :issue => {:project => 'ecookbook'})
+    issue = submit_email('ticket_html_only.eml', :issue => {'project' => 'ecookbook'})
     assert issue.is_a?(Issue)
     assert !issue.new_record?
     issue.reload
