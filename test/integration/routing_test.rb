@@ -336,13 +336,6 @@ class RoutingTest < ActionController::IntegrationTest
     should_route :delete, "/projects/22/wiki/ladida", :controller => 'wiki', :action => 'destroy', :project_id => '22', :id => 'ladida'
   end
 
-  context "wikis (plural, admin setup)" do
-    should_route :get, "/projects/ladida/wiki/destroy", :controller => 'wikis', :action => 'destroy', :id => 'ladida'
-
-    should_route :post, "/projects/ladida/wiki", :controller => 'wikis', :action => 'edit', :id => 'ladida'
-    should_route :post, "/projects/ladida/wiki/destroy", :controller => 'wikis', :action => 'destroy', :id => 'ladida'
-  end
-
   context "administration panel" do
     should_route :get, "/admin/projects", :controller => 'admin', :action => 'projects'
   end

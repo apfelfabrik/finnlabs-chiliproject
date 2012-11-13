@@ -56,7 +56,7 @@ class RedmineTest < ActiveSupport::TestCase
   end
 
   def test_project_menu
-    assert_number_of_items_in_menu :project_menu, 14
+    assert_number_of_items_in_menu :project_menu, 13
     assert_menu_contains_item_named :project_menu, :overview
     assert_menu_contains_item_named :project_menu, :activity
     assert_menu_contains_item_named :project_menu, :roadmap
@@ -66,7 +66,6 @@ class RedmineTest < ActiveSupport::TestCase
     assert_menu_contains_item_named :project_menu, :gantt
     assert_menu_contains_item_named :project_menu, :news
     assert_menu_contains_item_named :project_menu, :documents
-    assert_menu_contains_item_named :project_menu, :wiki
     assert_menu_contains_item_named :project_menu, :boards
     assert_menu_contains_item_named :project_menu, :files
     assert_menu_contains_item_named :project_menu, :repository
