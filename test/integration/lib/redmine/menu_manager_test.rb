@@ -86,8 +86,13 @@ class MenuManagerTest < ActionController::IntegrationTest
 
   def test_dynamic_menu_map_deferred
     assert_no_difference 'Redmine::MenuManager.items(:some_menu).size' do
-      Redmine::MenuManager.map(:some_other_menu).push :baz, {:controller => 'projects', :action => 'show'}, :caption => 'Baz'
-      Redmine::MenuManager.map(:some_other_menu).delete :baz
+      assert_deprecated do
+        Redmine::MenuManager.map(:some_other_menu).push :baz, {:controller => 'projects', :action => 'show'}, :caption => 'Baz'
+      end
+
+      assert_deprecated do
+        Redmine::MenuManager.map(:some_other_menu).delete :baz
+      end
     end
   end
 end
