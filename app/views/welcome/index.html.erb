@@ -1,41 +1,42 @@
-<% breadcrumb_paths(nil) %>
-<div class="splitcontentleft">
-  <div class="wiki"><%= textilizable Setting.welcome_text %></div>
-  <% if @news.any? %>
-  <div class="mypage-box">
-	<h3><%=l(:label_news_latest)%></h3>
-        <div class="overview">
-		<%= render :partial => 'news/news', :collection => @news %>
-		<%= link_to l(:label_news_view_all), :controller => 'news' %>
+<% clear_breadcrumbs %>
 
+<div class="splitcontentleft">
+  <div class="wiki">
+    <%= textilize Setting.welcome_text %>
   </div>
-  </div>
+
+  <% if @news.any? %>
+    <div class="mypage-box">
+      <h3><%=t :label_news_latest %></h3>
+      <div class="overview">
+        <%= render @news %>
+        <%= link_to t(:label_news_view_all), news_index_path %>
+      </div>
+    </div>
   <% end %>
+
   <%= call_hook(:view_welcome_index_left, :projects => @projects) %>
 </div>
 
 <div class="splitcontentright">
-    <% if @projects.any? %>
-	<div class="projects mypage-box overview">
-	<h3><%=l(:label_project_latest)%></h3>
-		<ul>
-		<% for project in @projects %>
-		  <% @project = project %>
-			<li>
-			<%= link_to_project project %> (<%= format_time(project.created_on) %>)
-			<%= textilizable project.short_description, :project => project %>
-			</li>
-		<% end %>
-    <% @project = nil %>
-		</ul>
-	</div>
-	<% end %>
-    <%= call_hook(:view_welcome_index_right, :projects => @projects) %>
+  <% if @projects.any? %>
+    <div class="projects mypage-box overview">
+      <h3><%=t :label_project_latest %></h3>
+      <ul>
+      <% @projects.each do |project| %>
+        <li>
+          <%= link_to_project project %> (<%= format_time(project.created_on) %>)
+          <%= textilize project.short_description, :project => project %>
+        </li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= call_hook(:view_welcome_index_right, :projects => @projects) %>
 </div>
 
 <% content_for :header_tags do %>
-<%= auto_discovery_link_tag(:atom, {:controller => 'news', :action => 'index', :key => User.current.rss_key, :format => 'atom'},
-                                   :title => "#{Setting.app_title}: #{l(:label_news_latest)}") %>
-<%= auto_discovery_link_tag(:atom, {:controller => 'activities', :action => 'index', :key => User.current.rss_key, :format => 'atom'},
-                                   :title => "#{Setting.app_title}: #{l(:label_activity)}") %>
+  <%= auto_discovery_link_tag :atom, news_index_url(:key => current_user.rss_key), :title => "#{Setting.app_title}: #{t(:label_news_latest)}" %>
+  <%= auto_discovery_link_tag :atom, activities_url(:key => current_user.rss_key), :title => "#{Setting.app_title}: #{t(:label_activity)}" %>
 <% end %>

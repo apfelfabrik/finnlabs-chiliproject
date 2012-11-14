@@ -33,6 +33,10 @@ module BreadcrumbHelper
     end
   end
 
+  def clear_breadcrumbs
+    @breadcrumb_paths = []
+  end
+
   private
 
   def link_to_project_ancestors(project)

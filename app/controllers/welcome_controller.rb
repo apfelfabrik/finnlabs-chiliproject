@@ -13,17 +13,15 @@
 #++
 
 class WelcomeController < ApplicationController
+  # GET /
   def index
     @news     = current_user.latest_news
     @projects = current_user.latest_projects
   end
 
+  # GET /robots.txt
   def robots
     @projects = Project.active.public
-
-    respond_to do |format|
-      format.text # { render :layout => false }
-    end
   end
   caches_action :robots
 end
