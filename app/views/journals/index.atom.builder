@@ -2,7 +2,7 @@ xml.instruct!
 xml.feed "xmlns" => "http://www.w3.org/2005/Atom" do
   xml.title   @title
   xml.link    "rel" => "self", "href" => url_for(:format => 'atom', :key => User.current.rss_key, :only_path => false)
-  xml.link    "rel" => "alternate", "href" => home_url(:only_path => false)
+  xml.link    "rel" => "alternate", "href" => root_url
   xml.id      url_for(:controller => 'welcome', :only_path => false)
   xml.updated((@journals.first ? @journals.first.event_datetime : Time.now).xmlschema)
   xml.author  { xml.name "#{Setting.app_title}" }

@@ -1,6 +1,6 @@
 module BreadcrumbHelper
   def full_breadcrumb
-    breadcrumb_list(link_to(l(:label_home), home_path),
+    breadcrumb_list(link_to(l(:label_home), root_path),
                     link_to_project_ancestors(@project),
                     *breadcrumb_paths)
   end

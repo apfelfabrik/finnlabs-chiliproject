@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
   def delete_broken_cookies
     if cookies['_chiliproject_session'] && cookies['_chiliproject_session'] !~ /--/
       cookies.delete '_chiliproject_session'
-      redirect_to home_path
+      redirect_to root_path
       return false
     end
   end

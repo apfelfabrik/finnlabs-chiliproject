@@ -21,7 +21,7 @@ class AccountController < ApplicationController
   # Login request and validation
   def login
     if User.current.logged?
-      redirect_to home_url
+      redirect_to root_url
     elsif request.post?
       authenticate_user
     end
@@ -30,15 +30,15 @@ class AccountController < ApplicationController
   # Log out current user and redirect to welcome page
   def logout
     logout_user
-    redirect_to home_url
+    redirect_to root_url
   end
 
   # Enable user to choose a new password
   def lost_password
-    redirect_to(home_url) && return unless Setting.lost_password?
+    redirect_to(root_url) && return unless Setting.lost_password?
     if params[:token]
       @token = Token.find_by_action_and_value("recovery", params[:token])
-      redirect_to(home_url) && return unless @token and !@token.expired?
+      redirect_to(root_url) && return unless @token and !@token.expired?
       @user = @token.user
       if request.post?
         @user.password, @user.password_confirmation = params[:new_password], params[:new_password_confirmation]
@@ -63,7 +63,7 @@ class AccountController < ApplicationController
         if token.save
           UserMailer.password_lost(token).deliver
           flash[:notice] = l(:notice_account_lost_email_sent)
-          redirect_to :action => 'login', :back_url => home_url
+          redirect_to :action => 'login', :back_url => root_url
           return
         end
       end
@@ -72,7 +72,7 @@ class AccountController < ApplicationController
 
   # User self-registration
   def register
-    redirect_to(home_url) && return unless Setting.self_registration? || session[:auth_source_registration]
+    redirect_to(root_url) && return unless Setting.self_registration? || session[:auth_source_registration]
     if request.get?
       session[:auth_source_registration] = nil
       @user = User.new(:language => Setting.default_language)
@@ -109,11 +109,11 @@ class AccountController < ApplicationController
 
   # Token based account activation
   def activate
-    redirect_to(home_url) && return unless Setting.self_registration? && params[:token]
+    redirect_to(root_url) && return unless Setting.self_registration? && params[:token]
     token = Token.find_by_action_and_value('register', params[:token])
-    redirect_to(home_url) && return unless token and !token.expired?
+    redirect_to(root_url) && return unless token and !token.expired?
     user = token.user
-    redirect_to(home_url) && return unless user.registered?
+    redirect_to(root_url) && return unless user.registered?
     user.activate
     if user.save
       token.destroy
@@ -165,7 +165,7 @@ class AccountController < ApplicationController
         user = User.find_or_initialize_by_identity_url(identity_url)
         if user.new_record?
           # Self-registration off
-          redirect_to(home_url) && return unless Setting.self_registration?
+          redirect_to(root_url) && return unless Setting.self_registration?
 
           # Create on the fly
           user.login = registration['nickname'] unless registration['nickname'].nil?

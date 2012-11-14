@@ -63,7 +63,7 @@ class AccountControllerTest < ActionController::TestCase
   def test_login_with_logged_account
     @request.session[:user_id] = 2
     get :login
-    assert_redirected_to home_url
+    assert_redirected_to root_url
   end
 
   if Object.const_defined?(:OpenID)
@@ -86,7 +86,7 @@ class AccountControllerTest < ActionController::TestCase
     Setting.self_registration = '0'
     Setting.openid = '1'
     post :login, :openid_url => 'http;//openid.example.com/good_user'
-    assert_redirected_to home_url
+    assert_redirected_to root_url
   end
 
   def test_login_with_openid_for_existing_non_active_user
@@ -119,7 +119,7 @@ class AccountControllerTest < ActionController::TestCase
     Setting.self_registration = '0'
     Setting.openid = '1'
     post :login, :openid_url => 'http://openid.example.com/good_user'
-    assert_redirected_to home_url
+    assert_redirected_to root_url
     user = User.find_by_login('cool_user')
     assert ! user
   end
@@ -202,7 +202,7 @@ class AccountControllerTest < ActionController::TestCase
         get :register
       end
 
-      should redirect_to('/') { home_url }
+      should redirect_to('/') { root_url }
     end
   end
 
@@ -240,7 +240,7 @@ class AccountControllerTest < ActionController::TestCase
         post :register
       end
 
-      should redirect_to('/') { home_url }
+      should redirect_to('/') { root_url }
     end
   end
 
