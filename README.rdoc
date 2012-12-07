@@ -1,5 +1,7 @@
 = ChiliProject
 
+<em>Finnlabs continues ChiliProject development in a fork named OpenProject. See https://github.com/opf/openproject and https://openproject.org. Please create pull requests against our OpenProject repository.</em>
+
 ChiliProject is a web based project management system. It supports your team throughout the complete project life cycle, from setting up and discussing a project plan, over tracking issues and reporting work progress to collaboratively sharing knowledge.
 
 More documentation and user guides can be found on the official website[https://www.chiliproject.org] and in the doc/ directory.
