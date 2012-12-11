@@ -62,7 +62,8 @@ module Redmine
       register default_theme
     end
 
-    self.register_default_theme # called on load
+    # always register default theme
+    self.register_default_theme
   end
 end
 

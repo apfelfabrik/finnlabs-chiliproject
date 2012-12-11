@@ -102,6 +102,18 @@ module Redmine
           expect(Theme.new(:some_name)).to eq Theme.new('some_name')
         end
       end
+      
+      describe '#image_tag' do
+        it "prepends the theme name" do
+          theme = Theme.new(:some_name)
+          expect(theme.image_tag('some_image')).to eq 'some_name/some_image'
+        end
+
+        it "won't prepend the theme name for the default theme" do
+          theme = Theme.default
+          expect(theme.image_tag('some_image')).to eq 'some_image'
+        end
+      end
     end
   end
 end

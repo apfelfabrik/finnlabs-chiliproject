@@ -126,7 +126,7 @@ module Redmine
       it 'always registers the default theme on load' do
         # reload the file because we called Themes.clear in the before block
         # maybe better: skip the before block for this example?!
-        load File.expand_path('../../../lib/redmine/themes.rb', __FILE__)
+        load File.expand_path('../../../../lib/redmine/themes.rb', __FILE__)
 
         expect(Themes.all).to include Themes.default_theme
       end
