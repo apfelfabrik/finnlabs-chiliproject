@@ -722,25 +722,32 @@ $(window).bind('resizeEnd', function() {
           });
         });
 
-        jQuery('#main-menu #toggle-project-menu a.navigation-toggler').click(function(){
-          if ($('#main-menu #toggle-project-menu').hasClass('show')) {
-            // Show project navigation
-            $('#main-menu').removeClass('hidden')
-            $('#menu-sidebar').removeClass('hidden');
-            $('#main-menu #toggle-project-menu').removeClass('show');
-            $('#main-menu #toggle-project-menu').removeAttr("style");
-            $('#content').removeClass('hidden-navigation');
+        // users of some old IEs are out of luck ATM. An userData
+        // implementation could be provided though, that would be great!
+        var remember_menu_state = function(match) {
+          if (typeof window.sessionStorage != 'undefined') {
+            if (typeof match == 'undefined') {
+              return sessionStorage.getItem('navigation-toggle');
+            } else {
+              return sessionStorage.setItem('navigation-toggle', match.length > 0 ? 'collapsed' : 'expanded')
+            }
           }
-          else {
-            // Hide project navigation
-            var height = $(document).height();
-            $('#main-menu').addClass('hidden');
-            $('#menu-sidebar').addClass('hidden');
-            $('#main-menu #toggle-project-menu').addClass('show');
-            $('#main-menu #toggle-project-menu.show').css({height:height});
-            $('#content').addClass('hidden-navigation');
-          };
-        });
+          return false;
+        };
+
+        var toggle_navigation = function() {
+          var height = $(document).height() - $('#main-menu').offset().top - 32;
+          $('#main-menu, #menu-sidebar').toggleClass('hidden');
+          $('#content').toggleClass('hidden-navigation');
+          $('#toggle-project-menu').removeAttr("style").toggleClass('show');
+          remember_menu_state($('#toggle-project-menu.show').css({height:height}));
+        };
+
+        // register toggler, and toggle for the first time if remembered to be closed.
+        jQuery('#toggle-project-menu .navigation-toggler').click(toggle_navigation);
+        if ($('#main-menu').length > 0 && remember_menu_state() === "collapsed") {
+          toggle_navigation();
+        }
 });
 
 var Administration = (function ($) {
