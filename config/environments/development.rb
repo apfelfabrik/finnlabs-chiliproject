@@ -29,3 +29,23 @@ config.action_controller.perform_caching             = false
 
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
+
+# configure and initialize MiniProfiler, remove me as soon as we are on rails 3
+require 'rack-mini-profiler'
+c = ::Rack::MiniProfiler.config
+c.pre_authorize_cb = lambda { |env| Rails.env.development? }
+tmp = Rails.root.to_s + "/tmp/miniprofiler"
+FileUtils.mkdir_p(tmp) unless File.exists?(tmp)
+c.storage_options = {:path => tmp}
+c.storage = ::Rack::MiniProfiler::FileStore
+config.middleware.use(::Rack::MiniProfiler)
+::Rack::MiniProfiler.profile_method(ActionController::Base, :process) {|action| "Executing action: #{action}"}
+::Rack::MiniProfiler.profile_method(ActionView::Template, :render) {|x,y| "Rendering: #{@virtual_path}"}
+
+# monkey patch away an activesupport and json_pure incompatability
+# http://pivotallabs.com/users/alex/blog/articles/1332-monkey-patch-of-the-day-activesupport-vs-json-pure-vs-ruby-1-8
+if JSON.const_defined?(:Pure)
+  class JSON::Pure::Generator::State
+    include ActiveSupport::CoreExtensions::Hash::Except
+  end
+end
