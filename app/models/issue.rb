@@ -91,6 +91,14 @@ class Issue < ActiveRecord::Base
     }
   }
 
+  # find all issues having set a parent_id where the root_id is not valid because
+  # 1) it points to self
+  # 2) it points to an issue with a parent
+  named_scope :invalid_root_ids, { :conditions => "issues.parent_id IS NOT NULL AND " +
+                                                  "(issues.root_id = issues.id OR " +
+                                                    "(issues.root_id = parent_issues.id AND parent_issues.parent_id IS NOT NULL))",
+                                   :joins => "LEFT OUTER JOIN issues parent_issues ON parent_issues.id = issues.parent_id" }
+
   before_create :default_assign
   before_save :close_duplicates, :update_done_ratio_from_issue_status
   after_save :reschedule_following_issues, :update_nested_set_attributes, :update_parent_attributes
@@ -716,6 +724,42 @@ class Issue < ActiveRecord::Base
       end
     end
     projects
+  end
+
+  # method from acts_as_nested_set
+  def self.valid?
+    super && invalid_root_ids.empty?
+  end
+
+  def self.all_invalid
+    (super + invalid_root_ids).uniq
+  end
+
+  def self.rebuild_silently!(roots = nil)
+
+    invalid_root_ids_to_fix = if roots.is_a? Array
+                                roots
+                              elsif roots.present?
+                                [roots]
+                              end
+
+    invalid_root_ids.each do |issue|
+
+      # At this point we can not trust nested set methods as the root_id is invalid.
+      # Therefore we trust the parent_issue_id to fetch all ancestors until we find the root
+      ancestor = issue
+
+      while ancestor.parent_issue_id do
+        ancestor = Issue.find_by_id(ancestor.parent_issue_id)
+      end
+
+      if !invalid_root_ids_to_fix || invalid_root_ids_to_fix.map(&:id).include?(ancestor.id)
+        Issue.update_all({ :root_id => ancestor.id },
+                         { :id => issue.id })
+      end
+    end
+
+    super
   end
 
   private
