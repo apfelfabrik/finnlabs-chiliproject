@@ -8,7 +8,7 @@ FactoryGirl.define do
     
     factory :valid_issue do
       after :build do |issue|
-        issue.project = Factory.build(:valid_project)
+        issue.project = FactoryGirl.build(:valid_project)
         issue.tracker = issue.project.trackers.first
       end
     end
