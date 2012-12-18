@@ -22,10 +22,10 @@ GIT
       rails (~> 3.2.9)
 
 GIT
-  remote: git@github.com:finnlabs/openproject-themes.git
-  revision: f197b4f24c252c4761eb5b6aa140a38446de48d4
+  remote: git@github.com:finnlabs/finnlabs-themes.git
+  revision: 0f4c67de5d9dad727903e700c12e7cf9c8e24359
   specs:
-    openproject-themes (0.1.0)
+    finnlabs-themes (0.2.0)
       rails (~> 3.2.8)
 
 GEM
@@ -335,6 +335,7 @@ DEPENDENCIES
   execjs
   factory_girl_rails (~> 4.0)
   fastercsv (~> 1.5.0)
+  finnlabs-themes!
   globalize3!
   guard-cucumber
   guard-rspec
@@ -353,7 +354,6 @@ DEPENDENCIES
   mysql
   mysql2 (~> 0.3.11)
   object-daddy!
-  openproject-themes!
   pg
   prototype-rails
   pry-debugger

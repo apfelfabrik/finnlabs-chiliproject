@@ -62,7 +62,7 @@ group :openid do
   gem "ruby-openid", '~> 2.1.4', :require => 'openid'
 end
 
-gem 'openproject-themes', :git => 'git@github.com:finnlabs/openproject-themes.git'
+gem 'finnlabs-themes', :git => 'git@github.com:finnlabs/finnlabs-themes.git'
 gem 'landing_page', :git => 'git@github.com:finnlabs/chiliproject_landing_page.git', :branch => 'rails3'
 
 group :development do
