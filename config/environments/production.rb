@@ -28,3 +28,8 @@ config.action_mailer.raise_delivery_errors = false
 
 # No email in production log
 config.action_mailer.logger = nil
+
+# quick-fix to prevent the dreaded XML parameter exploit from the beginning of 2013
+# todo: upgrade rails
+ActiveSupport::CoreExtensions::Hash::Conversions::XML_PARSING.delete('symbol')
+ActiveSupport::CoreExtensions::Hash::Conversions::XML_PARSING.delete('yaml')
