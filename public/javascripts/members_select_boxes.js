@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
         setTimeout (function () {
           var attributes, allowed, currentName, fakeInput;
           attributes = {}
-          allowed = ["title", "placeholder"];
+          allowed = ["title", "placeholder", "multiple"];
 
           for(var i = 0; i < $(elem).get(0).attributes.length; i++) {
             currentName = $(elem).get(0).attributes[i].name;
@@ -38,6 +38,7 @@ jQuery(document).ready(function($) {
           }
 
           $(fakeInput).select2({
+            multiple: fakeInput.attr("multiple"),
             minimumInputLength: 1,
             ajax: {
                 url: $(fakeInput).attr("data-ajaxURL"),
@@ -65,7 +66,7 @@ jQuery(document).ready(function($) {
             formatResult: formatItems,
             formatSelection: formatItemSelection
           });
-          $(elem).hide();
+          $(elem).remove();
         }, 0);
       }
     });
