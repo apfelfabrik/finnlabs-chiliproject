@@ -16,7 +16,6 @@
         <label>
           <%= select_tag 'member[role_ids][]', options_for_select([]),
                          :title => l(:label_role_plural),
-                         :multiple => true,
                          :'data-placeholder' => l(:label_role_search),
                          :'data-ajaxURL' => url_for(:controller => "roles", :action => "autocomplete_for_role"),
                          :'data-projectId' => project.id,
