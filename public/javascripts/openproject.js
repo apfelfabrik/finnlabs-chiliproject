@@ -302,7 +302,7 @@ window.OpenProject = (function ($) {
 
           var k;
           for (k = 0; k < parents.length; k += 1) {
-            if (typeof previousParents[k] === "undefined") 
+            if (typeof previousParents === "undefined" || typeof previousParents[k] === "undefined") 
               break;
 
             if (previousParents[k].id !== parents[k].id)
