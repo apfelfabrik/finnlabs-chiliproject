@@ -47,7 +47,7 @@ window.OpenProject = (function ($) {
     };
 
     return function (url, callback) {
-      var fetchArgs = arguments;
+      var fetchArgs = Array.prototype.slice.call(arguments);
       if (typeof url === "function") {
         callback = url;
         url = undefined;
